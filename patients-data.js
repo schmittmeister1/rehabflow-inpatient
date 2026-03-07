@@ -1,4 +1,4 @@
-h// =====================================================
+// =====================================================
 // RehabFlow Inpatient EMR â 120 Mock Patient Cases
 // Hospital inpatient PT/PTA training system
 // Section GG, Assist Levels, Vitals, Precautions
