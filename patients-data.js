@@ -1,4 +1,4 @@
-// =====================================================
+h// =====================================================
 // RehabFlow Inpatient EMR â 120 Mock Patient Cases
 // Hospital inpatient PT/PTA training system
 // Section GG, Assist Levels, Vitals, Precautions
@@ -10,60 +10,214 @@ const LAST_NAMES = ['Thompson','Rodriguez','Williams','Chen','Baker','Johnson','
 
 // Inpatient diagnoses â neuro, cardiopulmonary, orthopedic, medical/surgical
 const DIAGNOSES = [
-  // Neuro
+
+  // ============== NEURO ==============
   { code:'I63.9', desc:'Cerebral infarction (CVA), unspecified', category:'Neuro', complexity:'high' },
   { code:'I63.511', desc:'Cerebral infarction due to occlusion of right middle cerebral artery', category:'Neuro', complexity:'high' },
   { code:'I63.512', desc:'Cerebral infarction due to occlusion of left middle cerebral artery', category:'Neuro', complexity:'high' },
+  { code:'I63.411', desc:'Cerebral infarction due to embolism of right middle cerebral artery', category:'Neuro', complexity:'high' },
+  { code:'I63.10', desc:'Cerebral infarction due to embolism of unspecified precerebral artery', category:'Neuro', complexity:'high' },
   { code:'I61.9', desc:'Hemorrhagic stroke, unspecified', category:'Neuro', complexity:'high' },
+  { code:'I61.0', desc:'Nontraumatic intracerebral hemorrhage in hemisphere, subcortical', category:'Neuro', complexity:'high' },
   { code:'G81.91', desc:'Hemiplegia, unspecified, affecting right dominant side', category:'Neuro', complexity:'high' },
   { code:'G81.92', desc:'Hemiplegia, unspecified, affecting left dominant side', category:'Neuro', complexity:'high' },
   { code:'G82.20', desc:'Paraplegia, unspecified', category:'Neuro', complexity:'high' },
-  { code:'S06.0X0A', desc:'Concussion without loss of consciousness, initial', category:'Neuro', complexity:'moderate' },
+  { code:'S06.0X0A', desc:'Concussion without loss of consciousness, initial encounter', category:'Neuro', complexity:'moderate' },
+  { code:'S06.5X0A', desc:'Traumatic subdural hemorrhage without loss of consciousness, initial', category:'Neuro', complexity:'high' },
   { code:'S14.109A', desc:'Incomplete spinal cord injury at C-spine level, initial', category:'Neuro', complexity:'high' },
-  { code:'G35', desc:'Multiple sclerosis exacerbation', category:'Neuro', complexity:'high' },
-  { code:'G61.0', desc:'Guillain-Barre syndrome', category:'Neuro', complexity:'high' },
+  { code:'S24.109A', desc:'Incomplete spinal cord injury at T-spine level, initial', category:'Neuro', complexity:'high' },
+  { code:'G35', desc:'Multiple sclerosis, acute exacerbation', category:'Neuro', complexity:'high' },
+  { code:'G61.0', desc:'Guillain-BarrÃ© syndrome', category:'Neuro', complexity:'high' },
   { code:'G20', desc:'Parkinson disease, decompensation', category:'Neuro', complexity:'high' },
-  // Cardiopulmonary
-  { code:'I50.9', desc:'Heart failure, unspecified', category:'Cardiopulmonary', complexity:'high' },
+  { code:'G40.909', desc:'Epilepsy/status epilepticus, unspecified', category:'Neuro', complexity:'high' },
+  { code:'G93.1', desc:'Anoxic brain injury, not elsewhere classified', category:'Neuro', complexity:'high' },
+
+  // ============== CARDIOPULMONARY ==============
+  { code:'I50.9', desc:'Heart failure, unspecified (CHF exacerbation)', category:'Cardiopulmonary', complexity:'high' },
   { code:'I50.22', desc:'Chronic systolic heart failure, acute exacerbation', category:'Cardiopulmonary', complexity:'high' },
-  { code:'I21.9', desc:'Acute myocardial infarction, unspecified', category:'Cardiopulmonary', complexity:'high' },
-  { code:'I25.10', desc:'Atherosclerotic heart disease, s/p CABG', category:'Cardiopulmonary', complexity:'high' },
-  { code:'J96.00', desc:'Acute respiratory failure, unspecified', category:'Cardiopulmonary', complexity:'high' },
+  { code:'I50.23', desc:'Acute on chronic systolic (congestive) heart failure', category:'Cardiopulmonary', complexity:'high' },
+  { code:'I50.33', desc:'Acute on chronic diastolic (congestive) heart failure', category:'Cardiopulmonary', complexity:'high' },
+  { code:'I21.9', desc:'Acute myocardial infarction, unspecified (post-MI)', category:'Cardiopulmonary', complexity:'high' },
+  { code:'I21.09', desc:'ST elevation myocardial infarction of anterior wall', category:'Cardiopulmonary', complexity:'high' },
+  { code:'I21.11', desc:'ST elevation myocardial infarction of inferior wall', category:'Cardiopulmonary', complexity:'high' },
+  { code:'I25.10', desc:'Atherosclerotic heart disease s/p CABG', category:'Cardiopulmonary', complexity:'high' },
+  { code:'I25.110', desc:'Atherosclerotic heart disease of native coronary artery with unstable angina, s/p stent placement', category:'Cardiopulmonary', complexity:'high' },
+  { code:'J96.00', desc:'Acute respiratory failure, unspecified hypoxia vs hypercapnia', category:'Cardiopulmonary', complexity:'high' },
+  { code:'J96.01', desc:'Acute respiratory failure with hypoxia', category:'Cardiopulmonary', complexity:'high' },
   { code:'J44.1', desc:'COPD with acute exacerbation', category:'Cardiopulmonary', complexity:'high' },
+  { code:'J44.0', desc:'COPD with acute lower respiratory infection', category:'Cardiopulmonary', complexity:'high' },
   { code:'J18.9', desc:'Pneumonia, unspecified organism', category:'Cardiopulmonary', complexity:'moderate' },
+  { code:'J13', desc:'Pneumonia due to Streptococcus pneumoniae', category:'Cardiopulmonary', complexity:'moderate' },
+  { code:'J15.1', desc:'Pneumonia due to Pseudomonas', category:'Cardiopulmonary', complexity:'high' },
+  { code:'J12.82', desc:'Pneumonia due to COVID-19 virus', category:'Cardiopulmonary', complexity:'high' },
   { code:'I26.99', desc:'Pulmonary embolism without acute cor pulmonale', category:'Cardiopulmonary', complexity:'high' },
-  // Orthopedic â Hip Fracture / Joint Replacement
+  { code:'I26.09', desc:'Saddle embolus of pulmonary artery with acute cor pulmonale', category:'Cardiopulmonary', complexity:'high' },
+
+  // ============== COVID-19 / INFLUENZA / RESPIRATORY INFECTIONS ==============
+  { code:'U07.1', desc:'COVID-19, virus identified', category:'Infectious', complexity:'high' },
+  { code:'J12.89', desc:'COVID-19 pneumonia with acute respiratory distress', category:'Infectious', complexity:'high' },
+  { code:'J09.X1', desc:'Influenza due to identified novel influenza A virus with pneumonia', category:'Infectious', complexity:'high' },
+  { code:'J10.1', desc:'Influenza due to other identified influenza virus with pneumonia', category:'Infectious', complexity:'moderate' },
+  { code:'J10.00', desc:'Influenza due to other identified influenza virus with unspecified type of pneumonia', category:'Infectious', complexity:'moderate' },
+
+  // ============== HIP FRACTURE ==============
   { code:'S72.001A', desc:'Fracture of unspecified part of neck of right femur, initial', category:'Hip Fracture', complexity:'high' },
   { code:'S72.002A', desc:'Fracture of unspecified part of neck of left femur, initial', category:'Hip Fracture', complexity:'high' },
   { code:'S72.011A', desc:'Unspecified intracapsular fracture of right femur, initial', category:'Hip Fracture', complexity:'high' },
   { code:'S72.012A', desc:'Unspecified intracapsular fracture of left femur, initial', category:'Hip Fracture', complexity:'high' },
   { code:'S72.101A', desc:'Unspecified trochanteric fracture of right femur, initial', category:'Hip Fracture', complexity:'high' },
+  { code:'S72.102A', desc:'Unspecified trochanteric fracture of left femur, initial', category:'Hip Fracture', complexity:'high' },
+  { code:'S72.21XA', desc:'Subtrochanteric fracture of right femur, initial', category:'Hip Fracture', complexity:'high' },
+  { code:'S72.22XA', desc:'Subtrochanteric fracture of left femur, initial', category:'Hip Fracture', complexity:'high' },
+
+  // ============== JOINT REPLACEMENT ==============
   { code:'Z96.641', desc:'Presence of right artificial hip joint (s/p right THA)', category:'Joint Replacement', complexity:'high' },
   { code:'Z96.642', desc:'Presence of left artificial hip joint (s/p left THA)', category:'Joint Replacement', complexity:'high' },
   { code:'Z96.651', desc:'Presence of right artificial knee joint (s/p right TKA)', category:'Joint Replacement', complexity:'high' },
   { code:'Z96.652', desc:'Presence of left artificial knee joint (s/p left TKA)', category:'Joint Replacement', complexity:'high' },
-  // Falls / Deconditioning
+  { code:'Z96.611', desc:'Presence of right artificial shoulder joint (s/p right TSA)', category:'Joint Replacement', complexity:'high' },
+  { code:'Z96.612', desc:'Presence of left artificial shoulder joint (s/p left TSA)', category:'Joint Replacement', complexity:'high' },
+  { code:'M87.051', desc:'Idiopathic aseptic necrosis of right femur, s/p hemiarthroplasty', category:'Joint Replacement', complexity:'high' },
+
+  // ============== TRAUMA / MOTOR VEHICLE ACCIDENT / GUNSHOT ==============
+  { code:'V43.52XA', desc:'Car passenger injured in collision with SUV, initial encounter (MVA)', category:'Trauma', complexity:'high' },
+  { code:'V43.62XA', desc:'Car passenger injured in collision with heavy transport vehicle, initial', category:'Trauma', complexity:'high' },
+  { code:'S72.301A', desc:'Unspecified fracture of shaft of right femur, initial (MVA)', category:'Trauma', complexity:'high' },
+  { code:'S72.302A', desc:'Unspecified fracture of shaft of left femur, initial (MVA)', category:'Trauma', complexity:'high' },
+  { code:'S22.31XA', desc:'Fracture of one rib, right side, initial encounter (MVA)', category:'Trauma', complexity:'moderate' },
+  { code:'S27.0XXA', desc:'Traumatic pneumothorax, initial encounter (MVA)', category:'Trauma', complexity:'high' },
+  { code:'S32.009A', desc:'Unspecified fracture of lumbar vertebra, initial (MVA)', category:'Trauma', complexity:'high' },
+  { code:'S82.101A', desc:'Unspecified fracture of upper end of right tibia, initial (MVA)', category:'Trauma', complexity:'high' },
+  { code:'S22.009A', desc:'Unspecified fracture of unspecified thoracic vertebra, initial', category:'Trauma', complexity:'high' },
+  { code:'T14.8XXA', desc:'Other injury of unspecified body region, initial (polytrauma)', category:'Trauma', complexity:'high' },
+  // Gunshot wounds
+  { code:'S31.109A', desc:'Unspecified open wound of abdominal wall, unspecified quadrant with penetration (GSW abdomen)', category:'Trauma', complexity:'high' },
+  { code:'S71.001A', desc:'Unspecified open wound, right hip (GSW right hip/thigh)', category:'Trauma', complexity:'high' },
+  { code:'S81.001A', desc:'Unspecified open wound, right lower leg (GSW right lower extremity)', category:'Trauma', complexity:'high' },
+  { code:'S21.109A', desc:'Unspecified open wound of front wall of thorax (GSW chest, post-thoracotomy)', category:'Trauma', complexity:'high' },
+  // Penetrating mechanism
+  { code:'W34.00XA', desc:'Accidental discharge from unspecified firearms, initial encounter', category:'Trauma', complexity:'high' },
+  { code:'X95.9XXA', desc:'Assault by unspecified firearm discharge, initial encounter', category:'Trauma', complexity:'high' },
+
+  // ============== SEPSIS ==============
+  { code:'A41.9', desc:'Sepsis, unspecified organism', category:'Sepsis', complexity:'high' },
+  { code:'A41.01', desc:'Sepsis due to Methicillin susceptible Staphylococcus aureus (MSSA)', category:'Sepsis', complexity:'high' },
+  { code:'A41.02', desc:'Sepsis due to Methicillin resistant Staphylococcus aureus (MRSA)', category:'Sepsis', complexity:'high' },
+  { code:'A41.51', desc:'Sepsis due to Escherichia coli (E. coli)', category:'Sepsis', complexity:'high' },
+  { code:'A40.0', desc:'Sepsis due to streptococcus, group A', category:'Sepsis', complexity:'high' },
+  { code:'R65.20', desc:'Severe sepsis without septic shock', category:'Sepsis', complexity:'high' },
+  { code:'R65.21', desc:'Severe sepsis with septic shock', category:'Sepsis', complexity:'high' },
+  { code:'A41.89', desc:'Other specified sepsis (urosepsis)', category:'Sepsis', complexity:'high' },
+
+  // ============== CANCER / ONCOLOGY ==============
+  { code:'C34.90', desc:'Malignant neoplasm of unspecified part of bronchus or lung', category:'Cancer', complexity:'high' },
+  { code:'C34.11', desc:'Malignant neoplasm of upper lobe, right bronchus or lung', category:'Cancer', complexity:'high' },
+  { code:'C50.911', desc:'Malignant neoplasm of unspecified site of right female breast', category:'Cancer', complexity:'high' },
+  { code:'C50.912', desc:'Malignant neoplasm of unspecified site of left female breast', category:'Cancer', complexity:'high' },
+  { code:'C18.9', desc:'Malignant neoplasm of colon, unspecified (colorectal cancer)', category:'Cancer', complexity:'high' },
+  { code:'C61', desc:'Malignant neoplasm of prostate', category:'Cancer', complexity:'high' },
+  { code:'C25.9', desc:'Malignant neoplasm of pancreas, unspecified', category:'Cancer', complexity:'high' },
+  { code:'C71.9', desc:'Malignant neoplasm of brain, unspecified', category:'Cancer', complexity:'high' },
+  { code:'C22.0', desc:'Liver cell carcinoma (hepatocellular carcinoma)', category:'Cancer', complexity:'high' },
+  { code:'C90.00', desc:'Multiple myeloma not having achieved remission', category:'Cancer', complexity:'high' },
+  { code:'C91.00', desc:'Acute lymphoblastic leukemia not having achieved remission', category:'Cancer', complexity:'high' },
+  { code:'C83.30', desc:'Diffuse large B-cell lymphoma, unspecified site', category:'Cancer', complexity:'high' },
+
+  // ============== DIABETES / ENDOCRINE ==============
+  { code:'E11.65', desc:'Type 2 diabetes mellitus with hyperglycemia', category:'Diabetes', complexity:'moderate' },
+  { code:'E11.641', desc:'Type 2 diabetes mellitus with hypoglycemia with coma', category:'Diabetes', complexity:'high' },
+  { code:'E11.10', desc:'Type 2 diabetes mellitus with ketoacidosis without coma', category:'Diabetes', complexity:'high' },
+  { code:'E11.69', desc:'Type 2 diabetes mellitus with other specified complication', category:'Diabetes', complexity:'moderate' },
+  { code:'E11.51', desc:'Type 2 diabetes mellitus with diabetic peripheral angiopathy without gangrene', category:'Diabetes', complexity:'high' },
+  { code:'E11.52', desc:'Type 2 diabetes mellitus with diabetic peripheral angiopathy with gangrene', category:'Diabetes', complexity:'high' },
+  { code:'E11.621', desc:'Type 2 diabetes mellitus with foot ulcer', category:'Diabetes', complexity:'high' },
+  { code:'E11.22', desc:'Type 2 diabetes mellitus with diabetic chronic kidney disease', category:'Diabetes', complexity:'high' },
+  { code:'E10.10', desc:'Type 1 diabetes mellitus with ketoacidosis without coma', category:'Diabetes', complexity:'high' },
+  { code:'E10.65', desc:'Type 1 diabetes mellitus with hyperglycemia', category:'Diabetes', complexity:'moderate' },
+  { code:'E13.65', desc:'Other specified diabetes mellitus with hyperglycemia', category:'Diabetes', complexity:'moderate' },
+
+  // ============== KIDNEY / RENAL ==============
+  { code:'N17.9', desc:'Acute kidney injury (AKI), unspecified', category:'Renal', complexity:'high' },
+  { code:'N17.0', desc:'Acute kidney failure with tubular necrosis', category:'Renal', complexity:'high' },
+  { code:'N18.6', desc:'End stage renal disease (ESRD)', category:'Renal', complexity:'high' },
+  { code:'N18.4', desc:'Chronic kidney disease, stage 4 (severe)', category:'Renal', complexity:'high' },
+  { code:'E11.22', desc:'Type 2 DM with diabetic chronic kidney disease', category:'Renal', complexity:'high' },
+
+  // ============== LIVER ==============
+  { code:'K72.00', desc:'Acute and subacute hepatic failure without coma', category:'Liver', complexity:'high' },
+  { code:'K72.01', desc:'Acute and subacute hepatic failure with coma', category:'Liver', complexity:'high' },
+  { code:'K70.41', desc:'Alcoholic hepatic failure with coma', category:'Liver', complexity:'high' },
+  { code:'K74.60', desc:'Unspecified cirrhosis of liver', category:'Liver', complexity:'high' },
+  { code:'K76.6', desc:'Portal hypertension', category:'Liver', complexity:'high' },
+
+  // ============== UTI / INFECTIONS ==============
+  { code:'N39.0', desc:'Urinary tract infection, site not specified', category:'Infectious', complexity:'moderate' },
+  { code:'A04.72', desc:'Enterocolitis due to Clostridioides difficile (C. diff)', category:'Infectious', complexity:'high' },
+  { code:'L03.115', desc:'Cellulitis of right lower limb', category:'Infectious', complexity:'moderate' },
+  { code:'L03.116', desc:'Cellulitis of left lower limb', category:'Infectious', complexity:'moderate' },
+  { code:'M86.9', desc:'Osteomyelitis, unspecified', category:'Infectious', complexity:'high' },
+  { code:'M86.171', desc:'Other acute osteomyelitis, right ankle and foot', category:'Infectious', complexity:'high' },
+  { code:'T81.42XA', desc:'Infection following a procedure, deep incisional surgical site', category:'Infectious', complexity:'high' },
+  { code:'T84.54XA', desc:'Infection and inflammatory reaction due to internal right knee prosthesis, initial', category:'Infectious', complexity:'high' },
+  { code:'B95.62', desc:'MRSA infection, unspecified site', category:'Infectious', complexity:'high' },
+  { code:'A49.02', desc:'Methicillin resistant Staphylococcus aureus infection, unspecified site', category:'Infectious', complexity:'high' },
+  { code:'G06.0', desc:'Intracranial abscess and granuloma', category:'Infectious', complexity:'high' },
+  { code:'I33.0', desc:'Acute and subacute infective endocarditis', category:'Infectious', complexity:'high' },
+  { code:'B37.7', desc:'Candidal sepsis', category:'Infectious', complexity:'high' },
+
+  // ============== FALLS / DECONDITIONING ==============
   { code:'R29.6', desc:'Repeated falls', category:'Falls', complexity:'moderate' },
   { code:'W19.XXXA', desc:'Unspecified fall, initial encounter', category:'Falls', complexity:'moderate' },
+  { code:'W01.0XXA', desc:'Fall on same level from slipping, tripping and stumbling without subsequent striking, initial', category:'Falls', complexity:'moderate' },
+  { code:'W10.9XXA', desc:'Fall on and from unspecified stairs and steps, initial encounter', category:'Falls', complexity:'moderate' },
   { code:'R53.1', desc:'Weakness / Generalized deconditioning', category:'Deconditioning', complexity:'moderate' },
   { code:'M62.81', desc:'Muscle weakness (generalized)', category:'Deconditioning', complexity:'moderate' },
   { code:'Z74.01', desc:'Bed confinement status / Immobility', category:'Deconditioning', complexity:'moderate' },
-  // Sepsis / Medical
-  { code:'A41.9', desc:'Sepsis, unspecified organism', category:'Sepsis', complexity:'high' },
-  { code:'A41.01', desc:'Sepsis due to Methicillin susceptible Staph aureus', category:'Sepsis', complexity:'high' },
-  { code:'R65.20', desc:'Severe sepsis without septic shock', category:'Sepsis', complexity:'high' },
-  { code:'R65.21', desc:'Severe sepsis with septic shock', category:'Sepsis', complexity:'high' },
-  // Other Systems
-  { code:'K92.0', desc:'Hematemesis (GI bleed)', category:'Other Systems', complexity:'high' },
-  { code:'N17.9', desc:'Acute kidney failure, unspecified', category:'Other Systems', complexity:'high' },
-  { code:'E11.65', desc:'Type 2 DM with hyperglycemia, uncontrolled', category:'Other Systems', complexity:'moderate' },
-  { code:'L89.319', desc:'Pressure ulcer of right buttock, stage 3', category:'Other Systems', complexity:'moderate' },
-  { code:'M86.9', desc:'Osteomyelitis, unspecified', category:'Other Systems', complexity:'high' },
-  { code:'C34.90', desc:'Malignant neoplasm of lung, unspecified', category:'Other Systems', complexity:'high' },
-  { code:'S32.009A', desc:'Unspecified fracture of lumbar vertebra, initial', category:'Other Systems', complexity:'high' },
-  { code:'S82.001A', desc:'Unspecified fracture of right tibia, initial', category:'Other Systems', complexity:'high' },
-  { code:'I74.3', desc:'Embolism and thrombosis of arteries of lower extremities (s/p BKA)', category:'Other Systems', complexity:'high' },
+  { code:'R54', desc:'Age-related physical debility / Frailty', category:'Deconditioning', complexity:'moderate' },
+  { code:'E46', desc:'Unspecified protein-calorie malnutrition', category:'Deconditioning', complexity:'moderate' },
+  { code:'R64', desc:'Cachexia', category:'Deconditioning', complexity:'high' },
+
+  // ============== OTHER ORTHOPEDIC / FRACTURES ==============
+  { code:'S82.001A', desc:'Unspecified fracture of right patella, initial encounter', category:'Orthopedic', complexity:'high' },
+  { code:'S82.101A', desc:'Unspecified fracture of upper end of right tibia (tibial plateau fracture), initial', category:'Orthopedic', complexity:'high' },
+  { code:'S82.201A', desc:'Unspecified fracture of shaft of right tibia, initial', category:'Orthopedic', complexity:'high' },
+  { code:'S82.891A', desc:'Other fracture of right lower leg (ankle fracture ORIF), initial', category:'Orthopedic', complexity:'high' },
+  { code:'S42.201A', desc:'Unspecified fracture of upper end of right humerus (proximal humerus fracture), initial', category:'Orthopedic', complexity:'high' },
+  { code:'S42.202A', desc:'Unspecified fracture of upper end of left humerus, initial', category:'Orthopedic', complexity:'high' },
+  { code:'S32.009A', desc:'Unspecified fracture of lumbar vertebra, initial encounter', category:'Orthopedic', complexity:'high' },
+  { code:'S22.009A', desc:'Unspecified fracture of unspecified thoracic vertebra, initial encounter', category:'Orthopedic', complexity:'high' },
+  { code:'S32.10XA', desc:'Unspecified fracture of sacrum, initial encounter', category:'Orthopedic', complexity:'high' },
+  { code:'S42.001A', desc:'Fracture of unspecified part of right clavicle, initial', category:'Orthopedic', complexity:'moderate' },
+  { code:'S52.501A', desc:'Unspecified fracture of the lower end of right radius (distal radius fracture), initial', category:'Orthopedic', complexity:'moderate' },
+  { code:'S12.9XXA', desc:'Unspecified fracture of cervical vertebra, initial encounter', category:'Orthopedic', complexity:'high' },
+  { code:'M84.459A', desc:'Pathological fracture in neoplastic disease, hip, initial encounter for fracture', category:'Orthopedic', complexity:'high' },
+
+  // ============== AMPUTATION / VASCULAR ==============
+  { code:'I74.3', desc:'Embolism and thrombosis of arteries of lower extremities (s/p BKA)', category:'Amputation', complexity:'high' },
+  { code:'E11.52', desc:'Type 2 DM with diabetic peripheral angiopathy with gangrene (s/p AKA)', category:'Amputation', complexity:'high' },
+  { code:'I70.261', desc:'Atherosclerosis of native arteries of extremities with gangrene, right leg (s/p BKA)', category:'Amputation', complexity:'high' },
+  { code:'I70.262', desc:'Atherosclerosis of native arteries of extremities with gangrene, left leg (s/p BKA)', category:'Amputation', complexity:'high' },
+  { code:'S48.011A', desc:'Complete traumatic amputation at knee level, right lower leg, initial', category:'Amputation', complexity:'high' },
+  { code:'Z89.511', desc:'Acquired absence of right leg below knee', category:'Amputation', complexity:'high' },
+  { code:'Z89.611', desc:'Acquired absence of right leg above knee', category:'Amputation', complexity:'high' },
+
+  // ============== GI / OTHER MEDICAL ==============
+  { code:'K92.0', desc:'Hematemesis (upper GI bleed)', category:'Other Medical', complexity:'high' },
+  { code:'K92.1', desc:'Melena (lower GI bleed)', category:'Other Medical', complexity:'high' },
+  { code:'K85.90', desc:'Acute pancreatitis without necrosis or infection, unspecified', category:'Other Medical', complexity:'high' },
+  { code:'K56.60', desc:'Unspecified intestinal obstruction (small bowel obstruction)', category:'Other Medical', complexity:'high' },
+  { code:'K35.80', desc:'Unspecified acute appendicitis (post-appendectomy)', category:'Other Medical', complexity:'moderate' },
+  { code:'L89.319', desc:'Pressure ulcer of right buttock, stage 3', category:'Other Medical', complexity:'moderate' },
+  { code:'L89.159', desc:'Pressure ulcer of sacral region, unstageable', category:'Other Medical', complexity:'moderate' },
+  { code:'D64.9', desc:'Anemia, unspecified', category:'Other Medical', complexity:'moderate' },
+  { code:'I82.401', desc:'Acute embolism and thrombosis of unspecified deep veins of right lower extremity (DVT)', category:'Other Medical', complexity:'high' },
+  { code:'I82.402', desc:'Acute embolism and thrombosis of unspecified deep veins of left lower extremity (DVT)', category:'Other Medical', complexity:'high' },
+  { code:'G89.29', desc:'Other chronic pain', category:'Other Medical', complexity:'moderate' },
+  { code:'F10.239', desc:'Alcohol dependence with withdrawal, unspecified', category:'Other Medical', complexity:'high' },
+  { code:'J95.811', desc:'Postprocedural pneumothorax (post-thoracic surgery)', category:'Other Medical', complexity:'high' },
+  { code:'T85.79XA', desc:'Infection and inflammatory reaction due to other internal prosthetic devices, implants and grafts, initial', category:'Other Medical', complexity:'high' },
 ];
+
 
 const ATTENDING_MDS = [
   'Dr. Robert Chen, MD (Hospitalist)','Dr. Sarah Kim, MD (Hospitalist)','Dr. Michael Torres, DO (Hospitalist)',
@@ -212,7 +366,7 @@ function seededRandom(seed) {
   let s = seed;
   return function() {
     s = (s * 16807 + 0) % 2147483647;
-    return (s - 1) / 21474833646;
+    return (s - 1) / 2147483646;
   };
 }
 
@@ -224,15 +378,23 @@ function generateInpatientPatients() {
 
   // Distribution of categories
   const categoryWeights = [
-    { cat: 'Neuro', weight: 25 },
-    { cat: 'Cardiopulmonary', weight: 18 },
-    { cat: 'Hip Fracture', weight: 15 },
-    { cat: 'Joint Replacement', weight: 12 },
-    { cat: 'Falls', weight: 8 },
-    { cat: 'Deconditioning', weight: 8 },
-    { cat: 'Sepsis', weight: 7 },
-    { cat: 'Other Systems', weight: 7 },
-  ];
+      { cat: 'Neuro', weight: 14 },
+      { cat: 'Cardiopulmonary', weight: 12 },
+      { cat: 'Hip Fracture', weight: 8 },
+      { cat: 'Joint Replacement', weight: 7 },
+      { cat: 'Trauma', weight: 8 },
+      { cat: 'Sepsis', weight: 7 },
+      { cat: 'Infectious', weight: 7 },
+      { cat: 'Cancer', weight: 6 },
+      { cat: 'Diabetes', weight: 5 },
+      { cat: 'Renal', weight: 4 },
+      { cat: 'Liver', weight: 3 },
+      { cat: 'Falls', weight: 4 },
+      { cat: 'Deconditioning', weight: 4 },
+      { cat: 'Orthopedic', weight: 5 },
+      { cat: 'Amputation', weight: 3 },
+      { cat: 'Other Medical', weight: 3 },
+    ];
 
   function pickWeightedCategory() {
     const total = categoryWeights.reduce((s,c) => s + c.weight, 0);
@@ -306,11 +468,11 @@ function generateInpatientPatients() {
     const precautions = pick(PRECAUTION_OPTIONS);
     // Add weight-bearing for ortho
     let wbStatus = 'WBAT';
-    if (category === 'Hip Fracture' || category === 'Joint Replacement') {
-      wbStatus = pick(['WBAT','FWB','PWB','TTWB','NWB']);
-    } else if (dx.code.startsWith('S82') || dx.code.startsWith('S32')) {
-      wbStatus = pick(['NWB','TTWB','PWB']);
-    }
+    if (category === 'Hip Fracture' || category === 'Joint Replacement' || category === 'Orthopedic') {
+        wbStatus = pick(['WBAT','FWB','PWB','TTWB','NWB']);
+      } else if (category === 'Trauma' || category === 'Amputation' || dx.code.startsWith('S82') || dx.code.startsWith('S32') || dx.code.startsWith('S72') || dx.code.startsWith('S42')) {
+        wbStatus = pick(['NWB','TTWB','PWB','WBAT']);
+      }
 
     // Alerts
     const alertCount = rand() < 0.3 ? 0 : (rand() < 0.6 ? 1 : 2);
@@ -344,13 +506,42 @@ function generateInpatientPatients() {
         rr: randInt(14, 22), spo2: randInt(94, 99), temp: (97.8 + rand() * 2).toFixed(1),
         o2_device: pick(['Room Air','Nasal Cannula 2L','Room Air','Room Air']),
       };
-    } else {
-      vitals = {
-        hr: randInt(60, 105), bp_sys: randInt(100, 155), bp_dia: randInt(55, 90),
-        rr: randInt(14, 22), spo2: randInt(93, 99), temp: (97.6 + rand() * 2.5).toFixed(1),
-        o2_device: pick(['Room Air','Room Air','Nasal Cannula 2L','Nasal Cannula 3L']),
-      };
-    }
+    } else if (category === 'Infectious') {
+        vitals = {
+          hr: randInt(80, 120), bp_sys: randInt(90, 145), bp_dia: randInt(50, 80),
+          rr: randInt(16, 26), spo2: randInt(90, 98),
+          temp: (98.5 + rand() * 4).toFixed(1),
+          o2_device: pick(['Room Air','Nasal Cannula 2L','Nasal Cannula 4L','Venturi Mask 35%']),
+        };
+      } else if (category === 'Trauma') {
+        vitals = {
+          hr: randInt(70, 115), bp_sys: randInt(95, 150), bp_dia: randInt(55, 85),
+          rr: randInt(14, 24), spo2: randInt(92, 99),
+          temp: (97.8 + rand() * 2).toFixed(1),
+          o2_device: pick(['Room Air','Room Air','Nasal Cannula 2L','Nasal Cannula 4L']),
+        };
+      } else if (category === 'Cancer') {
+        vitals = {
+          hr: randInt(65, 110), bp_sys: randInt(95, 145), bp_dia: randInt(55, 85),
+          rr: randInt(14, 24), spo2: randInt(91, 98),
+          temp: (97.4 + rand() * 3).toFixed(1),
+          o2_device: pick(['Room Air','Room Air','Nasal Cannula 2L','Nasal Cannula 3L']),
+        };
+      } else if (category === 'Renal' || category === 'Liver') {
+        vitals = {
+          hr: randInt(70, 110), bp_sys: randInt(95, 160), bp_dia: randInt(50, 85),
+          rr: randInt(14, 24), spo2: randInt(92, 98),
+          temp: (97.5 + rand() * 2.5).toFixed(1),
+          o2_device: pick(['Room Air','Room Air','Nasal Cannula 2L']),
+        };
+      } else {
+        vitals = {
+          hr: randInt(60, 105), bp_sys: randInt(100, 155), bp_dia: randInt(55, 90),
+          rr: randInt(14, 22), spo2: randInt(93, 99),
+          temp: (97.6 + rand() * 2.5).toFixed(1),
+          o2_device: pick(['Room Air','Room Air','Nasal Cannula 2L','Nasal Cannula 3L']),
+        };
+      }
 
     // Lines / Tubes / Drains
     const linesOptions = [
@@ -380,12 +571,19 @@ function generateInpatientPatients() {
 
     let ggBaseLevel;
     if (category === 'Neuro' && dx.complexity === 'high') ggBaseLevel = 1;
-    else if (category === 'Sepsis') ggBaseLevel = 1;
-    else if (category === 'Cardiopulmonary') ggBaseLevel = 2;
-    else if (category === 'Hip Fracture') ggBaseLevel = 2;
-    else if (category === 'Joint Replacement') ggBaseLevel = 3;
-    else if (category === 'Deconditioning') ggBaseLevel = 2;
-    else ggBaseLevel = 2;
+      else if (category === 'Sepsis') ggBaseLevel = 1;
+      else if (category === 'Trauma' && dx.complexity === 'high') ggBaseLevel = 1;
+      else if (category === 'Cardiopulmonary') ggBaseLevel = 2;
+      else if (category === 'Hip Fracture') ggBaseLevel = 2;
+      else if (category === 'Orthopedic') ggBaseLevel = 2;
+      else if (category === 'Amputation') ggBaseLevel = 2;
+      else if (category === 'Cancer') ggBaseLevel = 2;
+      else if (category === 'Renal' || category === 'Liver') ggBaseLevel = 2;
+      else if (category === 'Joint Replacement') ggBaseLevel = 3;
+      else if (category === 'Deconditioning') ggBaseLevel = 2;
+      else if (category === 'Infectious') ggBaseLevel = 2;
+      else if (category === 'Diabetes') ggBaseLevel = 3;
+      else ggBaseLevel = 2;
 
     const ggSelfCare = {};
     GG_SELF_CARE_ITEMS.forEach(item => {
