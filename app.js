@@ -1398,6 +1398,7 @@ function ProgressNote({ patient, user }) {
 // ==================== DOCUMENTS TAB ====================
 function generateNoteContent(note, patient) {
   const p = patient;
+  const safeJoin = (v,sep) => Array.isArray(v) ? v.join(sep) : (v || '');
   const subjectives = ['Patient reports feeling better today.','Patient reports mild soreness.','Patient tolerated treatment well.','Patient reports increased pain overnight.','Patient is motivated and engaged.','Patient reports difficulty sleeping due to pain.','Patient notes gradual improvement.'];
   const gaitDescs = ['Ambulated 150ft with rolling walker, CGA on level surfaces.','Ambulated 200ft with front-wheeled walker, supervision level.','Ambulated 100ft in hallway with rolling walker, min assist for balance.','Ambulated 250ft with single point cane, modified independent.','Ambulated 50ft bedside to bathroom with rolling walker, mod assist x1.'];
   const progressNotes = ['Patient demonstrating steady progress toward functional goals.','Patient showing gradual improvement in functional mobility.','Patient making good progress, responding well to interventions.','Patient progressing slower than expected, may need adjusted plan.'];
@@ -1422,17 +1423,17 @@ PATIENT INFORMATION:
   Admit Date: ${p.admitDate}
   Diagnosis: ${p.dx} (${p.dxCode})
   Admit Reason: ${p.admitReason||'See diagnosis'}
-  Precautions: ${(p.precautions||[]).join(', ')||'None noted'}
+  Precautions: ${safeJoin(p.precautions,", ")||'None noted'}
   WB Status: ${p.wbStatus||'WBAT'}
   Code Status: ${p.codeStatus||'Full code'}
-  Lines/Tubes: ${(p.lines||[]).join(', ')||'None'}
+  Lines/Tubes: ${safeJoin(p.lines,", ")||'None'}
 
 PAST MEDICAL HISTORY:
-  ${(p.pmh||[]).join(', ')||'None reported'}
+  ${safeJoin(p.pmh,", ")||'None reported'}
 
 PRIOR LEVEL OF FUNCTION:
   ${p.priorFunction||'Independent with all ADLs and mobility'}
-  Prior Devices: ${(p.priorDevices||[]).join(', ')||'None'}
+  Prior Devices: ${safeJoin(p.priorDevices,", ")||'None'}
 
 VITALS AT EVAL:
   BP: ${vit.bp||'N/A'}  HR: ${vit.hr||'N/A'}  RR: ${vit.rr||'N/A'}  SpO2: ${vit.spo2||'N/A'}  Temp: ${vit.temp||'N/A'}
