@@ -1,4 +1,4 @@
-<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>const { useState, <button className="btn btn-primary" onClick={onNewAdmission} style={{whiteSpace:"nowrap"}}>+ New Admission</button></div>useEffect, useCallback, useMemo } = React;
+const { useState, useEffect, useCallback, useMemo } = React;
 
 // Data loaded from patients-data.js
 
@@ -77,85 +77,76 @@ function LoginPage({ onLogin }) {
   );
 }
 
-
 // ==================== NEW ADMISSION MODAL ====================
 function NewAdmissionModal({ onClose, onSave }) {
   const [form, setForm] = useState({
     firstName:'', lastName:'', dob:'', gender:'Male',
     admitDate: new Date().toISOString().split('T')[0],
     roomNum:'', unit:'3 South', attendingMD:'',
-    dx:'', dxCode:'', category:'Hip Fracture',
-    insurance:'Medicare', codeStatus:'Full Code', wbStatus:'WBAT',
-    pmh:'', medications:'', priorFunction:'Independent with all mobility',
-    livingSituation:'Home alone', priorMobility:'Independent ambulation',
-    homeStairs:'No stairs', occupation:'Retired',
-    orientation:'x3 (person, place, time)', commandFollowing:'Follows 2-step commands',
-    safetyAwareness:'Intact safety awareness',
+    dx:'', dxCode:'', category:'Neuro',
+    insurance:'Medicare A', codeStatus:'Full Code', wbStatus:'WBAT',
+    pmh:'', medications:'',
+    priorFunction:'', priorMobility:'', livingSituation:'', homeStairs:'', occupation:'',
+    orientation:'Alert and oriented x4', commandFollowing:'Follows 2-step commands', safetyAwareness:'Good',
     linesDevices:''
   });
-  const set = (k,v) => setForm({...form,[k]:v});
-  const units = ['3 South','3 North','5 North','4 West','Medical Floor 2','Cardiac Step-Down','Neuro ICU','ICU','CCU'];
-  const categories = ['Hip Fracture','Neuro','Joint Replacement','Trauma','Infectious','Sepsis','Cancer','Amputation','Diabetes','Cardiopulmonary','Falls','Other Medical'];
-  const insurances = ['Medicare','Medicaid','Tricare','Anthem','UnitedHealthcare','Aetna','Cigna','Humana','Blue Cross Blue Shield','Workers Comp','Self-Pay'];
-  const codeStatuses = ['Full Code','DNR/DNI','DNR','Comfort Care'];
-  const wbStatuses = ['WBAT','FWB','PWB','TTWB','NWB','TDWB'];
-  const iS = {width:'100%',padding:'6px 8px',border:'1px solid #d1d5db',borderRadius:4,fontSize:13};
-  const lS = {fontSize:11,fontWeight:600,textTransform:'uppercase',color:'var(--text-muted)',marginBottom:2,display:'block'};
-  const sS = {...iS, background:'white'};
+  const u = (k,v) => setForm({...form,[k]:v});
+  const iS = {width:'100%',padding:'6px 8px',border:'1px solid #ccc',borderRadius:4,fontSize:13};
+  const lS = {display:'block',fontSize:11,fontWeight:600,marginBottom:2,color:'var(--text-muted)'};
+  const sS = {...iS};
   return (
-    <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:10000}}>
-      <div style={{background:'white',borderRadius:8,padding:24,width:780,maxHeight:'90vh',overflow:'auto',boxShadow:'0 20px 60px rgba(0,0,0,0.3)'}}>
-        <h3 style={{marginBottom:16,borderBottom:'2px solid var(--primary)',paddingBottom:8}}>New Patient Admission</h3>
-        <h4 style={{fontSize:13,fontWeight:700,color:'var(--primary)',marginBottom:8,marginTop:12}}>Patient Information</h4>
+    <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:9999,display:'flex',alignItems:'center',justifyContent:'center'}}>
+      <div style={{background:'#fff',borderRadius:12,width:'90%',maxWidth:720,maxHeight:'90vh',overflow:'auto',padding:24}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
+          <h2 style={{margin:0,fontSize:18,color:'var(--primary)'}}>New Patient Admission</h2>
+          <button onClick={onClose} style={{background:'none',border:'none',fontSize:20,cursor:'pointer'}}>X</button>
+        </div>
+        <h4 style={{fontSize:13,fontWeight:700,color:'var(--primary)',marginBottom:8,borderBottom:'1px solid #e2e8f0',paddingBottom:4}}>Patient Information</h4>
         <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 1fr',gap:10,marginBottom:16}}>
-          <div><label style={lS}>First Name*</label><input style={iS} value={form.firstName} onChange={e=>set('firstName',e.target.value)}/></div>
-          <div><label style={lS}>Last Name*</label><input style={iS} value={form.lastName} onChange={e=>set('lastName',e.target.value)}/></div>
-          <div><label style={lS}>Date of Birth*</label><input type="date" style={iS} value={form.dob} onChange={e=>set('dob',e.target.value)}/></div>
-          <div><label style={lS}>Gender</label><select style={sS} value={form.gender} onChange={e=>set('gender',e.target.value)}><option>Male</option><option>Female</option></select></div>
+          <div><label style={lS}>First Name *</label><input style={iS} value={form.firstName} onChange={e=>u('firstName',e.target.value)}/></div>
+          <div><label style={lS}>Last Name *</label><input style={iS} value={form.lastName} onChange={e=>u('lastName',e.target.value)}/></div>
+          <div><label style={lS}>Date of Birth *</label><input type="date" style={iS} value={form.dob} onChange={e=>u('dob',e.target.value)}/></div>
+          <div><label style={lS}>Gender</label><select style={sS} value={form.gender} onChange={e=>u('gender',e.target.value)}><option>Male</option><option>Female</option><option>Other</option></select></div>
         </div>
-        <h4 style={{fontSize:13,fontWeight:700,color:'var(--primary)',marginBottom:8}}>Admission Details</h4>
+        <h4 style={{fontSize:13,fontWeight:700,color:'var(--primary)',marginBottom:8,borderBottom:'1px solid #e2e8f0',paddingBottom:4}}>Admission Details</h4>
         <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 1fr',gap:10,marginBottom:16}}>
-          <div><label style={lS}>Admit Date</label><input type="date" style={iS} value={form.admitDate} onChange={e=>set('admitDate',e.target.value)}/></div>
-          <div><label style={lS}>Room Number*</label><input style={iS} value={form.roomNum} placeholder="e.g. 450B" onChange={e=>set('roomNum',e.target.value)}/></div>
-          <div><label style={lS}>Unit*</label><select style={sS} value={form.unit} onChange={e=>set('unit',e.target.value)}>{units.map(u=><option key={u}>{u}</option>)}</select></div>
-          <div><label style={lS}>Attending MD</label><input style={iS} value={form.attendingMD} placeholder="Dr." onChange={e=>set('attendingMD',e.target.value)}/></div>
+          <div><label style={lS}>Admit Date</label><input type="date" style={iS} value={form.admitDate} onChange={e=>u('admitDate',e.target.value)}/></div>
+          <div><label style={lS}>Room #</label><input style={iS} value={form.roomNum} onChange={e=>u('roomNum',e.target.value)}/></div>
+          <div><label style={lS}>Unit</label><select style={sS} value={form.unit} onChange={e=>u('unit',e.target.value)}><option>3 South</option><option>3 North</option><option>5 North</option><option>4 West</option><option>Medical Floor 2</option><option>Cardiac Step-Down</option><option>Neuro ICU</option><option>ICU</option><option>CCU</option></select></div>
+          <div><label style={lS}>Attending MD</label><input style={iS} value={form.attendingMD} onChange={e=>u('attendingMD',e.target.value)}/></div>
         </div>
-        <h4 style={{fontSize:13,fontWeight:700,color:'var(--primary)',marginBottom:8}}>Clinical Information</h4>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:8}}>
-          <div><label style={lS}>Admitting Diagnosis*</label><input style={iS} value={form.dx} placeholder="e.g. Hip fracture" onChange={e=>set('dx',e.target.value)}/></div>
-          <div><label style={lS}>ICD-10 Code</label><input style={iS} value={form.dxCode} placeholder="e.g. S72.001A" onChange={e=>set('dxCode',e.target.value)}/></div>
-        </div>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 1fr',gap:10,marginBottom:16}}>
-          <div><label style={lS}>Category</label><select style={sS} value={form.category} onChange={e=>set('category',e.target.value)}>{categories.map(c=><option key={c}>{c}</option>)}</select></div>
-          <div><label style={lS}>Insurance</label><select style={sS} value={form.insurance} onChange={e=>set('insurance',e.target.value)}>{insurances.map(i=><option key={i}>{i}</option>)}</select></div>
-          <div><label style={lS}>Code Status</label><select style={sS} value={form.codeStatus} onChange={e=>set('codeStatus',e.target.value)}>{codeStatuses.map(c=><option key={c}>{c}</option>)}</select></div>
-          <div><label style={lS}>Weight Bearing</label><select style={sS} value={form.wbStatus} onChange={e=>set('wbStatus',e.target.value)}>{wbStatuses.map(w=><option key={w}>{w}</option>)}</select></div>
-        </div>
-        <h4 style={{fontSize:13,fontWeight:700,color:'var(--primary)',marginBottom:8}}>Medical History</h4>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:16}}>
-          <div><label style={lS}>Past Medical History</label><textarea style={{...iS,minHeight:60}} value={form.pmh} placeholder="e.g. HTN, DM2, CHF" onChange={e=>set('pmh',e.target.value)}/></div>
-          <div><label style={lS}>Current Medications</label><textarea style={{...iS,minHeight:60}} value={form.medications} placeholder="e.g. Metoprolol 25mg BID" onChange={e=>set('medications',e.target.value)}/></div>
-        </div>
-        <h4 style={{fontSize:13,fontWeight:700,color:'var(--primary)',marginBottom:8}}>Prior Function and Social History</h4>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:8}}>
-          <div><label style={lS}>Prior Function Level</label><input style={iS} value={form.priorFunction} onChange={e=>set('priorFunction',e.target.value)}/></div>
-          <div><label style={lS}>Prior Mobility</label><input style={iS} value={form.priorMobility} onChange={e=>set('priorMobility',e.target.value)}/></div>
-        </div>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 1fr',gap:10,marginBottom:16}}>
-          <div><label style={lS}>Living Situation</label><input style={iS} value={form.livingSituation} onChange={e=>set('livingSituation',e.target.value)}/></div>
-          <div><label style={lS}>Home Stairs</label><input style={iS} value={form.homeStairs} onChange={e=>set('homeStairs',e.target.value)}/></div>
-          <div><label style={lS}>Occupation</label><input style={iS} value={form.occupation} onChange={e=>set('occupation',e.target.value)}/></div>
-          <div><label style={lS}>Lines/Devices</label><input style={iS} value={form.linesDevices} placeholder="e.g. Foley, IV" onChange={e=>set('linesDevices',e.target.value)}/></div>
-        </div>
-        <h4 style={{fontSize:13,fontWeight:700,color:'var(--primary)',marginBottom:8}}>Cognition</h4>
+        <h4 style={{fontSize:13,fontWeight:700,color:'var(--primary)',marginBottom:8,borderBottom:'1px solid #e2e8f0',paddingBottom:4}}>Clinical Information</h4>
         <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10,marginBottom:16}}>
-          <div><label style={lS}>Orientation</label><input style={iS} value={form.orientation} onChange={e=>set('orientation',e.target.value)}/></div>
-          <div><label style={lS}>Command Following</label><input style={iS} value={form.commandFollowing} onChange={e=>set('commandFollowing',e.target.value)}/></div>
-          <div><label style={lS}>Safety Awareness</label><input style={iS} value={form.safetyAwareness} onChange={e=>set('safetyAwareness',e.target.value)}/></div>
+          <div><label style={lS}>Diagnosis / Admit Reason *</label><input style={iS} value={form.dx} onChange={e=>u('dx',e.target.value)}/></div>
+          <div><label style={lS}>ICD-10 Code</label><input style={iS} value={form.dxCode} onChange={e=>u('dxCode',e.target.value)} placeholder="e.g. I63.9"/></div>
+          <div><label style={lS}>Category</label><select style={sS} value={form.category} onChange={e=>u('category',e.target.value)}><option>Neuro</option><option>Hip Fracture</option><option>Joint Replacement</option><option>Cardiac</option><option>Cardiopulmonary</option><option>General Debility</option><option>Spinal</option><option>Amputation</option><option>Burns</option><option>Other</option></select></div>
+          <div><label style={lS}>Insurance</label><select style={sS} value={form.insurance} onChange={e=>u('insurance',e.target.value)}><option>Medicare A</option><option>Medicare B</option><option>Medicaid</option><option>BCBS</option><option>UHC</option><option>Aetna</option><option>Cigna</option><option>Humana</option><option>Other</option></select></div>
+          <div><label style={lS}>Code Status</label><select style={sS} value={form.codeStatus} onChange={e=>u('codeStatus',e.target.value)}><option>Full Code</option><option>DNR/DNI</option><option>DNR Only</option><option>Comfort Care</option></select></div>
+          <div><label style={lS}>Weight Bearing</label><select style={sS} value={form.wbStatus} onChange={e=>u('wbStatus',e.target.value)}><option>WBAT</option><option>NWB</option><option>TTWB</option><option>PWB</option><option>FWB</option><option>Toe-Touch</option></select></div>
+        </div>
+        <h4 style={{fontSize:13,fontWeight:700,color:'var(--primary)',marginBottom:8,borderBottom:'1px solid #e2e8f0',paddingBottom:4}}>Medical History</h4>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:16}}>
+          <div><label style={lS}>Past Medical History</label><textarea style={{...iS,minHeight:60}} value={form.pmh} onChange={e=>u('pmh',e.target.value)} placeholder="HTN, DM2, CAD..."/></div>
+          <div><label style={lS}>Current Medications</label><textarea style={{...iS,minHeight:60}} value={form.medications} onChange={e=>u('medications',e.target.value)} placeholder="Metoprolol 25mg BID..."/></div>
+        </div>
+        <h4 style={{fontSize:13,fontWeight:700,color:'var(--primary)',marginBottom:8,borderBottom:'1px solid #e2e8f0',paddingBottom:4}}>Prior Function & Social History</h4>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:16}}>
+          <div><label style={lS}>Prior Function Level</label><input style={iS} value={form.priorFunction} onChange={e=>u('priorFunction',e.target.value)} placeholder="Independent with all ADLs/mobility"/></div>
+          <div><label style={lS}>Prior Mobility</label><input style={iS} value={form.priorMobility} onChange={e=>u('priorMobility',e.target.value)} placeholder="Independent community ambulator"/></div>
+          <div><label style={lS}>Living Situation</label><input style={iS} value={form.livingSituation} onChange={e=>u('livingSituation',e.target.value)} placeholder="Lives alone in single-story home"/></div>
+          <div><label style={lS}>Home Stairs</label><input style={iS} value={form.homeStairs} onChange={e=>u('homeStairs',e.target.value)} placeholder="3 steps to enter, no rails"/></div>
+          <div><label style={lS}>Occupation</label><input style={iS} value={form.occupation} onChange={e=>u('occupation',e.target.value)}/></div>
+          <div><label style={lS}>Lines/Devices</label><input style={iS} value={form.linesDevices} onChange={e=>u('linesDevices',e.target.value)} placeholder="PIV, Foley, O2 NC 2L"/></div>
+        </div>
+        <h4 style={{fontSize:13,fontWeight:700,color:'var(--primary)',marginBottom:8,borderBottom:'1px solid #e2e8f0',paddingBottom:4}}>Cognition</h4>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10,marginBottom:16}}>
+          <div><label style={lS}>Orientation</label><select style={sS} value={form.orientation} onChange={e=>u('orientation',e.target.value)}><option>Alert and oriented x4</option><option>Alert and oriented x3</option><option>Alert and oriented x2</option><option>Alert and oriented x1</option><option>Confused/Disoriented</option></select></div>
+          <div><label style={lS}>Command Following</label><select style={sS} value={form.commandFollowing} onChange={e=>u('commandFollowing',e.target.value)}><option>Follows 2-step commands</option><option>Follows 1-step commands</option><option>Follows simple commands with cues</option><option>Unable to follow commands</option></select></div>
+          <div><label style={lS}>Safety Awareness</label><select style={sS} value={form.safetyAwareness} onChange={e=>u('safetyAwareness',e.target.value)}><option>Good</option><option>Fair</option><option>Poor</option><option>Impulsive</option></select></div>
         </div>
         <div style={{display:'flex',justifyContent:'flex-end',gap:8,borderTop:'1px solid #e2e8f0',paddingTop:16}}>
-          <button className="btn btn-outline" onClick={onClose}>Cancel</button>
-          <button className="btn btn-primary" onClick={()=>{if(!form.firstName||!form.lastName||!form.dob||!form.roomNum||!form.dx){alert('Please fill required fields (marked with *)');return;}onSave(form);}}>Admit Patient</button>
+          <button className="btn" onClick={onClose}>Cancel</button>
+          <button className="btn btn-primary" onClick={()=>{if(!form.firstName||!form.lastName){alert('First and Last name are required');return;}onSave(form);}}>Admit Patient</button>
         </div>
       </div>
     </div>
@@ -212,71 +203,37 @@ function App() {
         <div className="content-area">
           {currentPage==='dashboard' && <Dashboard patients={patients} setSelectedPatient={setSelectedPatient} setCurrentPage={setCurrentPage}/>}
           {currentPage==='schedule' && <Schedule patients={patients} setSelectedPatient={setSelectedPatient} setCurrentPage={setCurrentPage}/>}
-          {currentPage==='patients' && <PatientCensus patients={patients} setPatients={setPatients} onNewAdmission={()=>setShowNewAdmission(true)} setSelectedPatient={setSelectedPatient} setCurrentPage={setCurrentPage}/>}
+          {currentPage==='patients' && <PatientCensus patients={patients} setPatients={setPatients} setSelectedPatient={setSelectedPatient} setCurrentPage={setCurrentPage} onNewAdmission={()=>setShowNewAdmission(true)}/>}
           {currentPage==='unitBoard' && <UnitBoard patients={patients} setSelectedPatient={setSelectedPatient} setCurrentPage={setCurrentPage}/>}
           {currentPage==='chart' && selectedPatient && <PatientChart patient={selectedPatient} user={user} setCurrentPage={setCurrentPage} patients={patients} setPatients={setPatients}/>}
         </div>
       </div>
       {showNewAdmission && <NewAdmissionModal onClose={()=>setShowNewAdmission(false)} onSave={(form)=>{
-        const newId = Math.max(...patients.map(p=>p.id),0)+1;
-        const dobDate = new Date(form.dob);
-        const today = new Date();
-        const age = Math.floor((today - dobDate)/(365.25*24*60*60*1000));
-        const mrn = 'MRN-' + String(900000+newId).padStart(6,'0');
-        const newPatient = {
-          id: newId,
-          firstName: form.firstName || 'New',
-          lastName: form.lastName || 'Patient',
-          dob: form.dob || '1960-01-01',
-          age: age || 60,
-          gender: form.gender || 'Male',
-          mrn: mrn,
-          roomNum: form.roomNum || 'TBD',
-          unit: form.unit || '3 South',
-          dx: form.dx || '',
-          dxCode: form.dxCode || '',
-          category: form.category || 'General',
+        var newId = Math.max(...patients.map(function(p){return p.id}),0)+1;
+        var dobDate = new Date(form.dob);
+        var today = new Date();
+        var age = Math.floor((today - dobDate)/(365.25*24*60*60*1000));
+        var mrn = 'MRN-' + String(900000+newId).padStart(6,'0');
+        var newPatient = {
+          id: newId, firstName: form.firstName, lastName: form.lastName,
+          dob: form.dob || '1960-01-01', age: age || 60, gender: form.gender || 'Male',
+          mrn: mrn, roomNum: form.roomNum || 'TBD', unit: form.unit || '3 South',
+          dx: form.dx || '', dxCode: form.dxCode || '', category: form.category || 'General',
           admitDate: form.admitDate || new Date().toISOString().split('T')[0],
-          losDay: 0,
-          status: 'Active',
-          careStage: 'Admission (Day 1)',
-          wbStatus: form.wbStatus || 'WBAT',
-          codeStatus: form.codeStatus || 'Full Code',
-          insurance: form.insurance || 'Medicare A',
-          attendingMD: form.attendingMD || '',
-          admitReason: form.dx || '',
-          pmh: form.pmh || '',
-          meds: form.medications || '',
+          losDay: 0, status: 'Active', careStage: 'Admission (Day 1)',
+          wbStatus: form.wbStatus || 'WBAT', codeStatus: form.codeStatus || 'Full Code',
+          insurance: form.insurance || 'Medicare A', attendingMD: form.attendingMD || '',
+          admitReason: form.dx || '', pmh: form.pmh || '', meds: form.medications || '',
           priorFunction: form.priorFunction || '',
-          socialHistory: {
-            livingSituation: form.livingSituation || '',
-            priorMobility: form.priorMobility || '',
-            homeStairs: form.homeStairs || '',
-            occupation: form.occupation || ''
-          },
-          cognition: {
-            orientation: form.orientation || 'Alert and oriented x4',
-            commandFollowing: form.commandFollowing || 'Follows 2-step commands',
-            safetyAwareness: form.safetyAwareness || 'Good'
-          },
+          socialHistory: { livingSituation: form.livingSituation || '', priorMobility: form.priorMobility || '', homeStairs: form.homeStairs || '', occupation: form.occupation || '' },
+          cognition: { orientation: form.orientation || 'Alert and oriented x4', commandFollowing: form.commandFollowing || 'Follows 2-step commands', safetyAwareness: form.safetyAwareness || 'Good' },
           vitals: { hr: 78, bp: '128/76', rr: 16, spo2: 97, temp: 98.4 },
-          assistLevels: {
-            sitToStand: 'Mod A',
-            ambulation: 'Mod A',
-            bed: 'Min A',
-            transfers: 'Mod A',
-            stairs: 'Not Assessed',
-            balance: 'CGA'
-          },
-          ggMobility: { rollLR: 3, sitToLying: 3, lyingToSit: 3, sitToStand: 3, chairTransfer: 3, toiletTransfer: 3, walk10ft: 3, walk50ft: 2, walk150ft: 2, stairs4: 1, stairs12: 1, pickUpObject: 2 },
-          ggSelfCare: { eating: 5, oralCare: 4, toileting: 3, showerBathe: 2, upperDress: 4, lowerDress: 3, onOffToilet: 3, socks: 3, shoes: 3 },
-          precautions: [],
-          alerts: [],
-          noteHistory: [],
-          lines: form.linesDevices ? [form.linesDevices] : [],
-          priorDevices: [],
-          totalTxSessions: 0,
-          dcRecommendation: ''
+          assistLevels: { sitToStand:'Mod A', ambulation:'Mod A', bed:'Min A', transfers:'Mod A', stairs:'Not Assessed', balance:'CGA' },
+          ggMobility: { rollLR:3, sitToLying:3, lyingToSit:3, sitToStand:3, chairTransfer:3, toiletTransfer:3, walk10ft:3, walk50ft:2, walk150ft:2, stairs4:1, stairs12:1, pickUpObject:2 },
+          ggSelfCare: { eating:5, oralCare:4, toileting:3, showerBathe:2, upperDress:4, lowerDress:3, onOffToilet:3, socks:3, shoes:3 },
+          precautions: [], alerts: [], noteHistory: [],
+          lines: form.linesDevices ? [form.linesDevices] : [], priorDevices: [],
+          totalTxSessions: 0, dcRecommendation: ''
         };
         setPatients([...patients, newPatient]);
         setSelectedPatient(newPatient);
@@ -482,7 +439,7 @@ function Schedule({ patients, setSelectedPatient, setCurrentPage }) {
 }
 
 // ==================== PATIENT CENSUS ====================
-function PatientCensus({ patients, setPatients, setSelectedPatient, setCurrentPage, onNewAdmission }) {
+function PatientCensus({ patients, setPatients, setSelectedPatient, setCurrentPage , onNewAdmission }) {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('Active');
   const [categoryFilter, setCategoryFilter] = useState('All');
@@ -532,6 +489,7 @@ function PatientCensus({ patients, setPatients, setSelectedPatient, setCurrentPa
 
   return (
     <div className="fade-in">
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}><h2 style={{margin:0,fontSize:18}}>Inpatient Census</h2><button className="btn btn-primary" onClick={onNewAdmission} style={{whiteSpace:"nowrap"}}>+ New Admission</button></div>
       <div style={{marginBottom:12}}>
         <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:8}}>
           <input placeholder="Search name, MRN, diagnosis, room, unit..." value={search} onChange={e=>{setSearch(e.target.value);setPage(0);}} style={{padding:'7px 12px',border:'1px solid var(--border)',borderRadius:4,width:350}} />
@@ -643,10 +601,17 @@ function UnitBoard({ patients, setSelectedPatient, setCurrentPage }) {
 }
 
 // ==================== PATIENT CHART ====================
-function PatientChart({ patient, user, setCurrentPage, patients, setPatients }) {
-  const handleSignNote = (noteEntry) => { if (patients && setPatients) { const updated = patients.map(p => p.id === patient.id ? {...p, noteHistory: [...(p.noteHistory||[]), noteEntry]} : p); setPatients(updated); } };
-
+function PatientChart({ patient, user, setCurrentPage , patients, setPatients }) {
   const [chartTab, setChartTab] = useState('overview');
+
+  const handleSignNote = (noteEntry) => {
+    if (patients && setPatients) {
+      const updated = patients.map(p => p.id === patient.id
+        ? {...p, noteHistory: [...(p.noteHistory||[]), noteEntry]}
+        : p);
+      setPatients(updated);
+    }
+  };
   const chartTabs = [
     { id:'overview', label:'Overview' },
     { id:'vitals', label:'Vitals/Lines' },
@@ -1189,7 +1154,7 @@ function AssistLevelsTab({ patient }) {
 }
 
 // ==================== INITIAL EVAL NOTE ====================
-function InitialEvalNote({ patient, user, onSignNote }) {
+function InitialEvalNote({ patient, user , onSignNote }) {
   const [noteStatus, setNoteStatus] = useState(patient.careStage==='Admission (Day 1)'?'draft':'signed');
   const [signedBy, setSignedBy] = useState(patient.careStage!=='Admission (Day 1)'?{name:'Dr. Sarah Mitchell, PT, DPT',date:patient.admitDate}:null);
   const isLocked = noteStatus === 'locked' || (patient.careStage!=='Admission (Day 1)' && noteStatus==='signed');
@@ -1203,8 +1168,8 @@ function InitialEvalNote({ patient, user, onSignNote }) {
     } else {
       setNoteStatus('signed');
       setSignedBy({ name: user.displayName, date: new Date().toLocaleString() });
-      if(onSignNote) onSignNote({type:'Initial Evaluation',date:new Date().toISOString().split('T')[0],author:user.displayName,status:'Signed & Locked'});
     }
+    if(onSignNote) onSignNote({type:'Initial Evaluation',date:new Date().toISOString().split('T')[0],author:user.displayName,status:'Signed & Locked'});
   };
   const handleLock = () => setNoteStatus('locked');
 
@@ -1325,7 +1290,7 @@ function InitialEvalNote({ patient, user, onSignNote }) {
 }
 
 // ==================== DAILY TREATMENT NOTE ====================
-function DailyTreatmentNote({ patient, user, onSignNote }) {
+function DailyTreatmentNote({ patient, user , onSignNote }) {
   const [noteStatus, setNoteStatus] = useState('draft');
   const [signedBy, setSignedBy] = useState(null);
 
@@ -1455,7 +1420,7 @@ function DailyTreatmentNote({ patient, user, onSignNote }) {
         {noteStatus==='draft' ? (
           <div className="signature-area">
             <p>Click "Sign Note" to electronically sign</p>
-            <button className="btn btn-success btn-lg" onClick={()=>{setNoteStatus('signed');setSignedBy({name:user.displayName,date:new Date().toLocaleString()});if(onSignNote)onSignNote({type:'Progress Note',date:new Date().toISOString().split('T')[0],author:user.displayName,status:'Signed & Locked'});}}>Sign Note</button>
+            <button className="btn btn-success btn-lg" onClick={()=>{setNoteStatus('signed');setSignedBy({name:user.displayName,date:new Date().toLocaleString()});;if(onSignNote){onSignNote({type:'Treatment Note',date:new Date().toISOString().split('T')[0],author:user.displayName,status:'Signed & Locked'})}}}>Sign Note</button>
           </div>
         ) : (
           <div className="signature-area signed">
@@ -1469,7 +1434,7 @@ function DailyTreatmentNote({ patient, user, onSignNote }) {
 }
 
 // ==================== PROGRESS NOTE ====================
-function ProgressNote({ patient, user, onSignNote }) {
+function ProgressNote({ patient, user , onSignNote }) {
   const [noteStatus, setNoteStatus] = useState('draft');
   const [signedBy, setSignedBy] = useState(null);
   const cd = useMemo(() => generateClinicalData(patient), [patient.id]);
@@ -1537,7 +1502,7 @@ function ProgressNote({ patient, user, onSignNote }) {
         {noteStatus==='draft' ? (
           <div className="signature-area">
             <p>Click "Sign Note" to electronically sign</p>
-            <button className="btn btn-success btn-lg" onClick={()=>{setNoteStatus('signed');setSignedBy({name:user.displayName,date:new Date().toLocaleString()});if(onSignNote)onSignNote({type:'Progress Note',date:new Date().toISOString().split('T')[0],author:user.displayName,status:'Signed & Locked'});}}>Sign Note</button>
+            <button className="btn btn-success btn-lg" onClick={()=>{setNoteStatus('signed');setSignedBy({name:user.displayName,date:new Date().toLocaleString()});;if(onSignNote){onSignNote({type:'Progress Note',date:new Date().toISOString().split('T')[0],author:user.displayName,status:'Signed & Locked'})}}}>Sign Note</button>
           </div>
         ) : (
           <div className="signature-area signed">
