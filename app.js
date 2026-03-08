@@ -227,12 +227,12 @@ function App() {
           priorFunction: form.priorFunction || '',
           socialHistory: { livingSituation: form.livingSituation || '', priorMobility: form.priorMobility || '', homeStairs: form.homeStairs || '', occupation: form.occupation || '' },
           cognition: { orientation: form.orientation || 'Alert and oriented x4', commandFollowing: form.commandFollowing || 'Follows 2-step commands', safetyAwareness: form.safetyAwareness || 'Good' },
-          vitals: { hr: 78, bp: '128/76', rr: 16, spo2: 97, temp: 98.4 },
+          vitals: { hr: 78, bp_sys: 128, bp_dia: 76, rr: 16, spo2: 97, temp: '98.4', o2_device: 'Room Air', pain: 3 },
           assistLevels: { sitToStand:'Mod A', ambulation:'Mod A', bed:'Min A', transfers:'Mod A', stairs:'Not Assessed', balance:'CGA' },
           ggMobility: { rollLR:3, sitToLying:3, lyingToSit:3, sitToStand:3, chairTransfer:3, toiletTransfer:3, walk10ft:3, walk50ft:2, walk150ft:2, stairs4:1, stairs12:1, pickUpObject:2 },
           ggSelfCare: { eating:5, oralCare:4, toileting:3, showerBathe:2, upperDress:4, lowerDress:3, onOffToilet:3, socks:3, shoes:3 },
           precautions: [], alerts: [], noteHistory: [],
-          lines: form.linesDevices ? [form.linesDevices] : [], priorDevices: [],
+          lines: form.linesDevices ? [form.linesDevices] : [], priorDevices: {},
           totalTxSessions: 0, dcRecommendation: ''
         };
         setPatients([...patients, newPatient]);
