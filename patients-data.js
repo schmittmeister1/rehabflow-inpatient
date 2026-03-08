@@ -1,5 +1,5 @@
 // =====================================================
-// RehabFlow Inpatient EMR â 120 Mock Patient Cases
+// RehabFlow Inpatient EMR  --  120 Mock Patient Cases
 // Hospital inpatient PT/PTA training system
 // Section GG, Assist Levels, Vitals, Precautions
 // =====================================================
@@ -8,7 +8,7 @@ const FIRST_NAMES_F = ['Margaret','Patricia','Dorothy','Linda','Barbara','Susan'
 const FIRST_NAMES_M = ['James','Robert','Michael','David','William','Richard','Joseph','Thomas','Charles','Christopher','Daniel','Matthew','Anthony','Mark','Steven','Paul','Andrew','Joshua','Kenneth','Kevin','Brian','Timothy','Ronald','Jason','Jeffrey','Ryan','Jacob','Gary','Nicholas','Eric','Jonathan','Patrick','Raymond','Gregory','Benjamin','Samuel','Henry','Alexander','Tyler','Nathan','Ethan','Dylan','Carlos','Juan','Luis','Jorge','Miguel','Pedro','Frank','Dennis'];
 const LAST_NAMES = ['Thompson','Rodriguez','Williams','Chen','Baker','Johnson','Martinez','Garcia','Brown','Davis','Wilson','Moore','Taylor','Anderson','Thomas','Jackson','White','Harris','Martin','Robinson','Clark','Lewis','Lee','Walker','Hall','Allen','Young','King','Wright','Scott','Green','Adams','Nelson','Hill','Campbell','Mitchell','Roberts','Carter','Phillips','Evans','Turner','Torres','Parker','Collins','Edwards','Stewart','Flores','Morris','Murphy','Rivera','Cook','Rogers','Reed','Morgan','Bell','Cooper','Richardson','Cox','Howard','Ward','Peterson','Gray','Ramirez','James','Watson','Brooks','Kelly','Sanders','Price','Bennett','Wood','Barnes','Ross','Henderson','Coleman','Jenkins','Perry','Butler','Foster','Simmons','Gonzalez','Bryant','Alexander','Russell','Griffin','Hayes','Myers','Ford','Hamilton','Graham','Sullivan','Wallace'];
 
-// Inpatient diagnoses â neuro, cardiopulmonary, orthopedic, medical/surgical
+// Inpatient diagnoses  --  neuro, cardiopulmonary, orthopedic, medical/surgical
 const DIAGNOSES = [
 
   // ============== NEURO ==============
@@ -27,7 +27,7 @@ const DIAGNOSES = [
   { code:'S14.109A', desc:'Incomplete spinal cord injury at C-spine level, initial', category:'Neuro', complexity:'high' },
   { code:'S24.109A', desc:'Incomplete spinal cord injury at T-spine level, initial', category:'Neuro', complexity:'high' },
   { code:'G35', desc:'Multiple sclerosis, acute exacerbation', category:'Neuro', complexity:'high' },
-  { code:'G61.0', desc:'Guillain-BarrÃ© syndrome', category:'Neuro', complexity:'high' },
+  { code:'G61.0', desc:'Guillain-Barre syndrome', category:'Neuro', complexity:'high' },
   { code:'G20', desc:'Parkinson disease, decompensation', category:'Neuro', complexity:'high' },
   { code:'G40.909', desc:'Epilepsy/status epilepticus, unspecified', category:'Neuro', complexity:'high' },
   { code:'G93.1', desc:'Anoxic brain injury, not elsewhere classified', category:'Neuro', complexity:'high' },
@@ -425,7 +425,7 @@ function generateInpatientPatients() {
     const firstName = isFemale ? pick(FIRST_NAMES_F) : pick(FIRST_NAMES_M);
     const lastName = pick(LAST_NAMES);
 
-    // Inpatient age distribution â weighted older
+    // Inpatient age distribution  --  weighted older
     const ageBase = rand();
     let age;
     if (ageBase < 0.03) age = randInt(18, 30);
@@ -710,7 +710,7 @@ function generateInpatientPatients() {
       cognition: {
         oriented: pick(['x4 (person, place, time, situation)','x3 (person, place, time)','x2 (person, place)','x1 (person only)','x4','x4','x4','x3']),
         followsCommands: pick(['Follows 3-step commands','Follows 2-step commands','Follows 1-step commands with cues','Follows simple commands with repetition','Unable to follow commands']),
-        safety: pick(['Good safety awareness','Fair safety awareness â requires verbal cues','Poor safety awareness â impulsive, requires constant supervision','Intact safety awareness','Fair â occasional impulsive behavior']),
+        safety: pick(['Good safety awareness','Fair safety awareness  --  requires verbal cues','Poor safety awareness  --  impulsive, requires constant supervision','Intact safety awareness','Fair  --  occasional impulsive behavior']),
       },
     });
   }
