@@ -45,7 +45,7 @@ function generateClinicalData(patient) {
     chiefComplaint: cc,
     hpi: pick(hpiTemplates),
     plof: `Prior to admission, patient was ${patient.socialHistory.priorMobility.toLowerCase()}. Living ${patient.socialHistory.living.toLowerCase()}. ${patient.socialHistory.stairs}. ${patient.socialHistory.occupation !== 'Retired' ? 'Employed as ' + patient.socialHistory.occupation.toLowerCase() + '.' : 'Retired.'} ${patient.priorDevices.walker ? 'Used walker for ambulation.' : ''} ${patient.priorDevices.manualWheelchair ? 'Used manual wheelchair.' : ''}`,
-    assessment: `Patient presents with functional limitations in mobility and ADLs secondary to ${patient.admitReason}. ${patient.category === 'Neuro' ? 'Neurological deficits noted affecting functional mobility.' : ''} ${patient.category === 'Cardiopulmonary' ? 'Activity tolerance limited by cardiopulmonary status.' : ''} Patient would benefit from skilled PT services to improve functional mobility, transfers, gait, and ADL independence to achieve safe discharge disposition. Rehab potential: ${pick(['Good','Fair','Fair to Good','Good â patient motivated'])} based on prior level of function and medical stability.`,
+    assessment: `Patient presents with functional limitations in mobility and ADLs secondary to ${patient.admitReason}. ${patient.category === 'Neuro' ? 'Neurological deficits noted affecting functional mobility.' : ''} ${patient.category === 'Cardiopulmonary' ? 'Activity tolerance limited by cardiopulmonary status.' : ''} Patient would benefit from skilled PT services to improve functional mobility, transfers, gait, and ADL independence to achieve safe discharge disposition. Rehab potential: ${pick(['Good','Fair','Fair to Good','Good  --  patient motivated'])} based on prior level of function and medical stability.`,
     ptDiagnosis: `Impaired functional mobility, balance deficits, and decreased independence with ADLs secondary to ${patient.admitReason}`,
     dcPlan: `Anticipated discharge to ${patient.dcRecommendation}. ${patient.socialHistory.stairs !== 'None' ? 'Patient will need to negotiate ' + patient.socialHistory.stairs.toLowerCase() + ' for home entry.' : ''} DME needs to be assessed prior to discharge.`,
   };
@@ -71,7 +71,7 @@ function LoginPage({ onLogin }) {
         <label>Password</label>
         <input type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="Enter password" onKeyDown={e=>e.key==='Enter'&&onLogin({username,role,displayName:role==='PTA'?'Alex Rivera, PTA':role==='Student PT'?`${username} (Student PT)`:role==='Student PTA'?`${username} (Student PTA)`:'Dr. Sarah Mitchell, PT, DPT'})}/>
         <button onClick={()=>onLogin({username,role,displayName:role==='PTA'?'Alex Rivera, PTA':role==='Student PT'?`${username} (Student PT)`:role==='Student PTA'?`${username} (Student PTA)`:'Dr. Sarah Mitchell, PT, DPT'})}>Sign In</button>
-        <p style={{marginTop:12,fontSize:11,color:'var(--text-muted)',textAlign:'center'}}>Training environment â No real patient data</p>
+        <p style={{marginTop:12,fontSize:11,color:'var(--text-muted)',textAlign:'center'}}>Training environment  --  No real patient data</p>
       </div>
     </div>
   );
@@ -118,7 +118,7 @@ function App() {
       </div>
       <div className="main-content">
         <div className="top-bar">
-          <h2>{currentPage==='chart'&&selectedPatient ? `${selectedPatient.lastName}, ${selectedPatient.firstName} â Rm ${selectedPatient.roomNum} (${selectedPatient.unit})` : navItems.find(n=>n.id===currentPage)?.label||'Dashboard'}</h2>
+          <h2>{currentPage==='chart'&&selectedPatient ? `${selectedPatient.lastName}, ${selectedPatient.firstName}  --  Rm ${selectedPatient.roomNum} (${selectedPatient.unit})` : navItems.find(n=>n.id===currentPage)?.label||'Dashboard'}</h2>
           <div className="top-bar-actions">
             <span style={{fontSize:11,opacity:0.7}}>{new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</span>
           </div>
@@ -171,7 +171,7 @@ function Dashboard({ patients, setSelectedPatient, setCurrentPage }) {
         </div>
 
         <div className="card">
-          <div className="card-header">New Admissions â Pending Initial Eval</div>
+          <div className="card-header">New Admissions  --  Pending Initial Eval</div>
           <div className="card-body" style={{padding:0}}>
             <table className="data-table">
               <thead><tr><th>Patient</th><th>Room</th><th>Diagnosis</th><th>Precautions</th></tr></thead>
@@ -286,12 +286,12 @@ function Schedule({ patients, setSelectedPatient, setCurrentPage }) {
         </div>
       </div>
       {isWeekend ? (
-        <div className="card"><div className="card-body" style={{textAlign:'center',padding:40,color:'var(--text-muted)'}}><h3>Weekend â Reduced Schedule</h3><p>Only essential/on-call patients scheduled.</p></div></div>
+        <div className="card"><div className="card-body" style={{textAlign:'center',padding:40,color:'var(--text-muted)'}}><h3>Weekend  --  Reduced Schedule</h3><p>Only essential/on-call patients scheduled.</p></div></div>
       ) : (
       <div className="card">
         <div className="card-body" style={{padding:0,overflowX:'auto'}}>
           <table className="data-table">
-            <thead><tr><th style={{width:80}}>Time</th><th>PT â Dr. Mitchell</th><th>PTA â A. Rivera</th></tr></thead>
+            <thead><tr><th style={{width:80}}>Time</th><th>PT  --  Dr. Mitchell</th><th>PTA  --  A. Rivera</th></tr></thead>
             <tbody>
               {times.map(t => {
                 const ptAppt = scheduleForDate.find(s=>s.time===t && s.therapist==='PT');
@@ -588,7 +588,7 @@ function OverviewTab({ patient }) {
             <div className="form-group"><label>Gender</label><input readOnly value={patient.gender} style={{background:'#f8fafc'}}/></div>
           </div>
           <div className="form-row" style={{gridTemplateColumns:'1fr 1fr'}}>
-            <div className="form-group"><label>Room / Unit</label><input readOnly value={`${patient.roomNum} â ${patient.unit}`} style={{background:'#f8fafc'}}/></div>
+            <div className="form-group"><label>Room / Unit</label><input readOnly value={`${patient.roomNum}  --  ${patient.unit}`} style={{background:'#f8fafc'}}/></div>
             <div className="form-group"><label>Admit Date</label><input readOnly value={patient.admitDate} style={{background:'#f8fafc'}}/></div>
           </div>
           <div className="form-group"><label>Admitting Diagnosis</label><input readOnly value={patient.dx} style={{background:'#f8fafc'}}/></div>
@@ -645,7 +645,7 @@ function VitalsTab({ patient }) {
         <div className="form-group"><label>Pain with Activity (0-10)</label><select defaultValue={Math.min(Math.floor(patient.id % 8) + 2, 10)}>{[...Array(11)].map((_,i)=><option key={i} value={i}>{i}</option>)}</select></div>
       </div>
 
-      <h4 style={{marginTop:16,marginBottom:8,color:'var(--primary)'}}>Vitals â Pre/During/Post Treatment</h4>
+      <h4 style={{marginTop:16,marginBottom:8,color:'var(--primary)'}}>Vitals  --  Pre/During/Post Treatment</h4>
       <div style={{overflowX:'auto'}}>
         <table className="assessment-table">
           <thead><tr><th></th><th>HR</th><th>BP</th><th>RR</th><th>SpO2</th><th>Pain</th><th>RPE (Borg)</th></tr></thead>
@@ -669,7 +669,7 @@ function VitalsTab({ patient }) {
       <div className="form-row" style={{gridTemplateColumns:'1fr 1fr'}}>
         <div className="form-group"><label>Current WB Status</label>
           <select defaultValue={patient.wbStatus}>
-            {WEIGHT_BEARING.map(wb=><option key={wb} value={wb}>{wb} â {
+            {WEIGHT_BEARING.map(wb=><option key={wb} value={wb}>{wb}  --  {
               wb==='WBAT'?'Weight Bear As Tolerated':wb==='FWB'?'Full Weight Bearing':wb==='PWB'?'Partial Weight Bearing':wb==='TTWB'?'Toe Touch Weight Bearing':wb==='NWB'?'Non-Weight Bearing':'Touch Down Weight Bearing'
             }</option>)}
           </select>
@@ -712,12 +712,12 @@ function SectionGGTab({ patient }) {
   return (
     <div>
       <div className="alert alert-info" style={{marginBottom:12}}>
-        <strong>Section GG â CMS Functional Assessment</strong> {'\u2014'} Scoring: 6=Independent, 5=Setup, 4=Supervision/Touching, 3=Partial Assist, 2=Substantial/Max Assist, 1=Dependent | 07=Refused, 09=N/A, 10=Not Attempted (Env), 88=Not Attempted (Medical/Safety)
+        <strong>Section GG  --  CMS Functional Assessment</strong> {'\u2014'} Scoring: 6=Independent, 5=Setup, 4=Supervision/Touching, 3=Partial Assist, 2=Substantial/Max Assist, 1=Dependent | 07=Refused, 09=N/A, 10=Not Attempted (Env), 88=Not Attempted (Medical/Safety)
       </div>
 
       {/* Prior Functioning GG 0100 */}
       <div className="card" style={{marginBottom:16}}>
-        <div className="card-header">GG 0100 â Prior Functioning (Prior to Current Illness/Exacerbation/Injury)</div>
+        <div className="card-header">GG 0100  --  Prior Functioning (Prior to Current Illness/Exacerbation/Injury)</div>
         <div className="card-body">
           <p style={{fontSize:11,color:'var(--text-muted)',marginBottom:8}}>3=Independent, 2=Needed Some Help, 1=Dependent, 8=Unknown, 9=Not Applicable</p>
           <div style={{overflowX:'auto'}}>
@@ -744,7 +744,7 @@ function SectionGGTab({ patient }) {
 
       {/* Prior Device Use GG 0110 */}
       <div className="card" style={{marginBottom:16}}>
-        <div className="card-header">GG 0110 â Prior Device Use</div>
+        <div className="card-header">GG 0110  --  Prior Device Use</div>
         <div className="card-body">
           <div style={{display:'flex',flexWrap:'wrap',gap:12}}>
             {[
@@ -764,8 +764,8 @@ function SectionGGTab({ patient }) {
 
       {/* Section tabs */}
       <div className="tabs" style={{marginBottom:0}}>
-        <div className={`tab ${activeSection==='selfCare'?'active':''}`} onClick={()=>setActiveSection('selfCare')}>GG 0130 â Self-Care</div>
-        <div className={`tab ${activeSection==='mobility'?'active':''}`} onClick={()=>setActiveSection('mobility')}>GG 0170 â Mobility</div>
+        <div className={`tab ${activeSection==='selfCare'?'active':''}`} onClick={()=>setActiveSection('selfCare')}>GG 0130  --  Self-Care</div>
+        <div className={`tab ${activeSection==='mobility'?'active':''}`} onClick={()=>setActiveSection('mobility')}>GG 0170  --  Mobility</div>
       </div>
 
       {/* GG 0130 Self-Care */}
@@ -1109,7 +1109,7 @@ function InitialEvalNote({ patient, user }) {
             <div className="form-group"><label>Stairs</label><textarea rows={2} defaultValue={`Ascending: ${patient.assistLevels.stairs.stairsUp}\nDescending: ${patient.assistLevels.stairs.stairsDown}\n${patient.assistLevels.stairs.steps}`}/></div>
           </div>
           <div className="form-row" style={{gridTemplateColumns:'1fr 1fr'}}>
-            <div className="form-group"><label>Balance</label><textarea rows={2} defaultValue={`Sitting balance: ${patient.assistLevels.bedMobility.supineToSit.includes('Independent')?'Good':'Fair â requires verbal/tactile cues'}\nStanding balance: ${patient.assistLevels.transfers.sitToStand.includes('Independent')?'Good':'Fair to Poor â requires assist for safety'}`}/></div>
+            <div className="form-group"><label>Balance</label><textarea rows={2} defaultValue={`Sitting balance: ${patient.assistLevels.bedMobility.supineToSit.includes('Independent')?'Good':'Fair  --  requires verbal/tactile cues'}\nStanding balance: ${patient.assistLevels.transfers.sitToStand.includes('Independent')?'Good':'Fair to Poor  --  requires assist for safety'}`}/></div>
             <div className="form-group"><label>Strength (Gross)</label><textarea rows={2} defaultValue={patient.category==='Neuro'?'UE: R 3/5 grossly, L 4/5 grossly\nLE: R 2+/5 grossly, L 4/5 grossly':'UE: 4/5 grossly bilateral\nLE: 3+/5 grossly bilateral'}/></div>
           </div>
         </div></div>
@@ -1201,7 +1201,7 @@ function DailyTreatmentNote({ patient, user }) {
         </div>
       </div></div>
 
-      {/* Objective â Vitals */}
+      {/* Objective  --  Vitals */}
       <div className="card"><div className="card-header">Objective {'\u2014'} Vitals</div><div className="card-body">
         <div style={{overflowX:'auto'}}>
           <table className="assessment-table">
@@ -1215,7 +1215,7 @@ function DailyTreatmentNote({ patient, user }) {
         </div>
       </div></div>
 
-      {/* Objective â Treatment Performed */}
+      {/* Objective  --  Treatment Performed */}
       <div className="card"><div className="card-header">Objective {'\u2014'} Treatment Performed</div><div className="card-body">
         <h4 style={{marginBottom:8}}>Functional Mobility (Check off assist level for each activity performed)</h4>
 
@@ -1273,9 +1273,9 @@ function DailyTreatmentNote({ patient, user }) {
           <select>
             <option>Making progress toward all goals</option>
             <option>Making progress toward some goals</option>
-            <option>Plateau â no significant change</option>
-            <option>Goals met â ready for discharge</option>
-            <option>Regression â declined from previous session</option>
+            <option>Plateau  --  no significant change</option>
+            <option>Goals met  --  ready for discharge</option>
+            <option>Regression  --  declined from previous session</option>
           </select>
         </div>
       </div></div>
@@ -1285,7 +1285,7 @@ function DailyTreatmentNote({ patient, user }) {
         <div className="form-group"><label>Plan for Next Session</label><textarea rows={2} defaultValue="" placeholder="Continue current POC, progress exercises, address..."/></div>
         <div className="form-group"><label>Discharge Disposition (if applicable)</label>
           <select defaultValue="">
-            <option value="">N/A â Continue treatment</option>
+            <option value="">N/A  --  Continue treatment</option>
             <option>Home with home health PT</option>
             <option>Home with outpatient PT</option>
             <option>Skilled nursing facility</option>
