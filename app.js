@@ -45,7 +45,7 @@ function generateClinicalData(patient) {
     chiefComplaint: cc,
     hpi: pick(hpiTemplates),
     plof: `Prior to admission, patient was ${patient.socialHistory.priorMobility.toLowerCase()}. Living ${patient.socialHistory.living.toLowerCase()}. ${patient.socialHistory.stairs}. ${patient.socialHistory.occupation !== 'Retired' ? 'Employed as ' + patient.socialHistory.occupation.toLowerCase() + '.' : 'Retired.'} ${patient.priorDevices.walker ? 'Used walker for ambulation.' : ''} ${patient.priorDevices.manualWheelchair ? 'Used manual wheelchair.' : ''}`,
-    assessment: `Patient presents with functional limitations in mobility and ADLs secondary to ${patient.admitReason}. ${patient.category === 'Neuro' ? 'Neurological deficits noted affecting functional mobility.' : ''} ${patient.category === 'Cardiopulmonary' ? 'Activity tolerance limited by cardiopulmonary status.' : ''} Patient would benefit from skilled PT services to improve functional mobility, transfers, gait, and ADL independence to achieve safe discharge disposition. Rehab potential: ${pick(['Good','Fair','Fair to Good','Good — patient motivated'])} based on prior level of function and medical stability.`,
+    assessment: `Patient presents with functional limitations in mobility and ADLs secondary to ${patient.admitReason}. ${patient.category === 'Neuro' ? 'Neurological deficits noted affecting functional mobility.' : ''} ${patient.category === 'Cardiopulmonary' ? 'Activity tolerance limited by cardiopulmonary status.' : ''} Patient would benefit from skilled PT services to improve functional mobility, transfers, gait, and ADL independence to achieve safe discharge disposition. Rehab potential: ${pick(['Good','Fair','Fair to Good','Good â patient motivated'])} based on prior level of function and medical stability.`,
     ptDiagnosis: `Impaired functional mobility, balance deficits, and decreased independence with ADLs secondary to ${patient.admitReason}`,
     dcPlan: `Anticipated discharge to ${patient.dcRecommendation}. ${patient.socialHistory.stairs !== 'None' ? 'Patient will need to negotiate ' + patient.socialHistory.stairs.toLowerCase() + ' for home entry.' : ''} DME needs to be assessed prior to discharge.`,
   };
@@ -71,7 +71,7 @@ function LoginPage({ onLogin }) {
         <label>Password</label>
         <input type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="Enter password" onKeyDown={e=>e.key==='Enter'&&onLogin({username,role,displayName:role==='PTA'?'Alex Rivera, PTA':role==='Student PT'?`${username} (Student PT)`:role==='Student PTA'?`${username} (Student PTA)`:'Dr. Sarah Mitchell, PT, DPT'})}/>
         <button onClick={()=>onLogin({username,role,displayName:role==='PTA'?'Alex Rivera, PTA':role==='Student PT'?`${username} (Student PT)`:role==='Student PTA'?`${username} (Student PTA)`:'Dr. Sarah Mitchell, PT, DPT'})}>Sign In</button>
-        <p style={{marginTop:12,fontSize:11,color:'var(--text-muted)',textAlign:'center'}}>Training environment — No real patient data</p>
+        <p style={{marginTop:12,fontSize:11,color:'var(--text-muted)',textAlign:'center'}}>Training environment â No real patient data</p>
       </div>
     </div>
   );
@@ -118,7 +118,7 @@ function App() {
       </div>
       <div className="main-content">
         <div className="top-bar">
-          <h2>{currentPage==='chart'&&selectedPatient ? `${selectedPatient.lastName}, ${selectedPatient.firstName} — Rm ${selectedPatient.roomNum} (${selectedPatient.unit})` : navItems.find(n=>n.id===currentPage)?.label||'Dashboard'}</h2>
+          <h2>{currentPage==='chart'&&selectedPatient ? `${selectedPatient.lastName}, ${selectedPatient.firstName} â Rm ${selectedPatient.roomNum} (${selectedPatient.unit})` : navItems.find(n=>n.id===currentPage)?.label||'Dashboard'}</h2>
           <div className="top-bar-actions">
             <span style={{fontSize:11,opacity:0.7}}>{new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</span>
           </div>
@@ -171,7 +171,7 @@ function Dashboard({ patients, setSelectedPatient, setCurrentPage }) {
         </div>
 
         <div className="card">
-          <div className="card-header">New Admissions — Pending Initial Eval</div>
+          <div className="card-header">New Admissions â Pending Initial Eval</div>
           <div className="card-body" style={{padding:0}}>
             <table className="data-table">
               <thead><tr><th>Patient</th><th>Room</th><th>Diagnosis</th><th>Precautions</th></tr></thead>
@@ -286,12 +286,12 @@ function Schedule({ patients, setSelectedPatient, setCurrentPage }) {
         </div>
       </div>
       {isWeekend ? (
-        <div className="card"><div className="card-body" style={{textAlign:'center',padding:40,color:'var(--text-muted)'}}><h3>Weekend — Reduced Schedule</h3><p>Only essential/on-call patients scheduled.</p></div></div>
+        <div className="card"><div className="card-body" style={{textAlign:'center',padding:40,color:'var(--text-muted)'}}><h3>Weekend â Reduced Schedule</h3><p>Only essential/on-call patients scheduled.</p></div></div>
       ) : (
       <div className="card">
         <div className="card-body" style={{padding:0,overflowX:'auto'}}>
           <table className="data-table">
-            <thead><tr><th style={{width:80}}>Time</th><th>PT — Dr. Mitchell</th><th>PTA — A. Rivera</th></tr></thead>
+            <thead><tr><th style={{width:80}}>Time</th><th>PT â Dr. Mitchell</th><th>PTA â A. Rivera</th></tr></thead>
             <tbody>
               {times.map(t => {
                 const ptAppt = scheduleForDate.find(s=>s.time===t && s.therapist==='PT');
@@ -588,7 +588,7 @@ function OverviewTab({ patient }) {
             <div className="form-group"><label>Gender</label><input readOnly value={patient.gender} style={{background:'#f8fafc'}}/></div>
           </div>
           <div className="form-row" style={{gridTemplateColumns:'1fr 1fr'}}>
-            <div className="form-group"><label>Room / Unit</label><input readOnly value={`${patient.roomNum} — ${patient.unit}`} style={{background:'#f8fafc'}}/></div>
+            <div className="form-group"><label>Room / Unit</label><input readOnly value={`${patient.roomNum} â ${patient.unit}`} style={{background:'#f8fafc'}}/></div>
             <div className="form-group"><label>Admit Date</label><input readOnly value={patient.admitDate} style={{background:'#f8fafc'}}/></div>
           </div>
           <div className="form-group"><label>Admitting Diagnosis</label><input readOnly value={patient.dx} style={{background:'#f8fafc'}}/></div>
@@ -645,7 +645,7 @@ function VitalsTab({ patient }) {
         <div className="form-group"><label>Pain with Activity (0-10)</label><select defaultValue={Math.min(Math.floor(patient.id % 8) + 2, 10)}>{[...Array(11)].map((_,i)=><option key={i} value={i}>{i}</option>)}</select></div>
       </div>
 
-      <h4 style={{marginTop:16,marginBottom:8,color:'var(--primary)'}}>Vitals — Pre/During/Post Treatment</h4>
+      <h4 style={{marginTop:16,marginBottom:8,color:'var(--primary)'}}>Vitals â Pre/During/Post Treatment</h4>
       <div style={{overflowX:'auto'}}>
         <table className="assessment-table">
           <thead><tr><th></th><th>HR</th><th>BP</th><th>RR</th><th>SpO2</th><th>Pain</th><th>RPE (Borg)</th></tr></thead>
@@ -669,7 +669,7 @@ function VitalsTab({ patient }) {
       <div className="form-row" style={{gridTemplateColumns:'1fr 1fr'}}>
         <div className="form-group"><label>Current WB Status</label>
           <select defaultValue={patient.wbStatus}>
-            {WEIGHT_BEARING.map(wb=><option key={wb} value={wb}>{wb} — {
+            {WEIGHT_BEARING.map(wb=><option key={wb} value={wb}>{wb} â {
               wb==='WBAT'?'Weight Bear As Tolerated':wb==='FWB'?'Full Weight Bearing':wb==='PWB'?'Partial Weight Bearing':wb==='TTWB'?'Toe Touch Weight Bearing':wb==='NWB'?'Non-Weight Bearing':'Touch Down Weight Bearing'
             }</option>)}
           </select>
@@ -712,12 +712,12 @@ function SectionGGTab({ patient }) {
   return (
     <div>
       <div className="alert alert-info" style={{marginBottom:12}}>
-        <strong>Section GG — CMS Functional Assessment</strong> {'\u2014'} Scoring: 6=Independent, 5=Setup, 4=Supervision/Touching, 3=Partial Assist, 2=Substantial/Max Assist, 1=Dependent | 07=Refused, 09=N/A, 10=Not Attempted (Env), 88=Not Attempted (Medical/Safety)
+        <strong>Section GG â CMS Functional Assessment</strong> {'\u2014'} Scoring: 6=Independent, 5=Setup, 4=Supervision/Touching, 3=Partial Assist, 2=Substantial/Max Assist, 1=Dependent | 07=Refused, 09=N/A, 10=Not Attempted (Env), 88=Not Attempted (Medical/Safety)
       </div>
 
       {/* Prior Functioning GG 0100 */}
       <div className="card" style={{marginBottom:16}}>
-        <div className="card-header">GG 0100 — Prior Functioning (Prior to Current Illness/Exacerbation/Injury)</div>
+        <div className="card-header">GG 0100 â Prior Functioning (Prior to Current Illness/Exacerbation/Injury)</div>
         <div className="card-body">
           <p style={{fontSize:11,color:'var(--text-muted)',marginBottom:8}}>3=Independent, 2=Needed Some Help, 1=Dependent, 8=Unknown, 9=Not Applicable</p>
           <div style={{overflowX:'auto'}}>
@@ -744,7 +744,7 @@ function SectionGGTab({ patient }) {
 
       {/* Prior Device Use GG 0110 */}
       <div className="card" style={{marginBottom:16}}>
-        <div className="card-header">GG 0110 — Prior Device Use</div>
+        <div className="card-header">GG 0110 â Prior Device Use</div>
         <div className="card-body">
           <div style={{display:'flex',flexWrap:'wrap',gap:12}}>
             {[
@@ -764,8 +764,8 @@ function SectionGGTab({ patient }) {
 
       {/* Section tabs */}
       <div className="tabs" style={{marginBottom:0}}>
-        <div className={`tab ${activeSection==='selfCare'?'active':''}`} onClick={()=>setActiveSection('selfCare')}>GG 0130 — Self-Care</div>
-        <div className={`tab ${activeSection==='mobility'?'active':''}`} onClick={()=>setActiveSection('mobility')}>GG 0170 — Mobility</div>
+        <div className={`tab ${activeSection==='selfCare'?'active':''}`} onClick={()=>setActiveSection('selfCare')}>GG 0130 â Self-Care</div>
+        <div className={`tab ${activeSection==='mobility'?'active':''}`} onClick={()=>setActiveSection('mobility')}>GG 0170 â Mobility</div>
       </div>
 
       {/* GG 0130 Self-Care */}
@@ -1109,7 +1109,7 @@ function InitialEvalNote({ patient, user }) {
             <div className="form-group"><label>Stairs</label><textarea rows={2} defaultValue={`Ascending: ${patient.assistLevels.stairs.stairsUp}\nDescending: ${patient.assistLevels.stairs.stairsDown}\n${patient.assistLevels.stairs.steps}`}/></div>
           </div>
           <div className="form-row" style={{gridTemplateColumns:'1fr 1fr'}}>
-            <div className="form-group"><label>Balance</label><textarea rows={2} defaultValue={`Sitting balance: ${patient.assistLevels.bedMobility.supineToSit.includes('Independent')?'Good':'Fair — requires verbal/tactile cues'}\nStanding balance: ${patient.assistLevels.transfers.sitToStand.includes('Independent')?'Good':'Fair to Poor — requires assist for safety'}`}/></div>
+            <div className="form-group"><label>Balance</label><textarea rows={2} defaultValue={`Sitting balance: ${patient.assistLevels.bedMobility.supineToSit.includes('Independent')?'Good':'Fair â requires verbal/tactile cues'}\nStanding balance: ${patient.assistLevels.transfers.sitToStand.includes('Independent')?'Good':'Fair to Poor â requires assist for safety'}`}/></div>
             <div className="form-group"><label>Strength (Gross)</label><textarea rows={2} defaultValue={patient.category==='Neuro'?'UE: R 3/5 grossly, L 4/5 grossly\nLE: R 2+/5 grossly, L 4/5 grossly':'UE: 4/5 grossly bilateral\nLE: 3+/5 grossly bilateral'}/></div>
           </div>
         </div></div>
@@ -1201,7 +1201,7 @@ function DailyTreatmentNote({ patient, user }) {
         </div>
       </div></div>
 
-      {/* Objective — Vitals */}
+      {/* Objective â Vitals */}
       <div className="card"><div className="card-header">Objective {'\u2014'} Vitals</div><div className="card-body">
         <div style={{overflowX:'auto'}}>
           <table className="assessment-table">
@@ -1215,7 +1215,7 @@ function DailyTreatmentNote({ patient, user }) {
         </div>
       </div></div>
 
-      {/* Objective — Treatment Performed */}
+      {/* Objective â Treatment Performed */}
       <div className="card"><div className="card-header">Objective {'\u2014'} Treatment Performed</div><div className="card-body">
         <h4 style={{marginBottom:8}}>Functional Mobility (Check off assist level for each activity performed)</h4>
 
@@ -1273,9 +1273,9 @@ function DailyTreatmentNote({ patient, user }) {
           <select>
             <option>Making progress toward all goals</option>
             <option>Making progress toward some goals</option>
-            <option>Plateau — no significant change</option>
-            <option>Goals met — ready for discharge</option>
-            <option>Regression — declined from previous session</option>
+            <option>Plateau â no significant change</option>
+            <option>Goals met â ready for discharge</option>
+            <option>Regression â declined from previous session</option>
           </select>
         </div>
       </div></div>
@@ -1285,7 +1285,7 @@ function DailyTreatmentNote({ patient, user }) {
         <div className="form-group"><label>Plan for Next Session</label><textarea rows={2} defaultValue="" placeholder="Continue current POC, progress exercises, address..."/></div>
         <div className="form-group"><label>Discharge Disposition (if applicable)</label>
           <select defaultValue="">
-            <option value="">N/A — Continue treatment</option>
+            <option value="">N/A â Continue treatment</option>
             <option>Home with home health PT</option>
             <option>Home with outpatient PT</option>
             <option>Skilled nursing facility</option>
@@ -1398,167 +1398,461 @@ function ProgressNote({ patient, user }) {
 // ==================== DOCUMENTS TAB ====================
 function generateNoteContent(note, patient) {
   const p = patient;
-  const safeJoin = (v,sep) => Array.isArray(v) ? v.join(sep) : (v || '');
-  const subjectives = ['Patient reports feeling better today.','Patient reports mild soreness.','Patient tolerated treatment well.','Patient reports increased pain overnight.','Patient is motivated and engaged.','Patient reports difficulty sleeping due to pain.','Patient notes gradual improvement.'];
-  const gaitDescs = ['Ambulated 150ft with rolling walker, CGA on level surfaces.','Ambulated 200ft with front-wheeled walker, supervision level.','Ambulated 100ft in hallway with rolling walker, min assist for balance.','Ambulated 250ft with single point cane, modified independent.','Ambulated 50ft bedside to bathroom with rolling walker, mod assist x1.'];
-  const progressNotes = ['Patient demonstrating steady progress toward functional goals.','Patient showing gradual improvement in functional mobility.','Patient making good progress, responding well to interventions.','Patient progressing slower than expected, may need adjusted plan.'];
-  const subj = subjectives[Math.floor(Math.random()*subjectives.length)];
-  const gait = gaitDescs[Math.floor(Math.random()*gaitDescs.length)];
-  const prog = progressNotes[Math.floor(Math.random()*progressNotes.length)];
-  const als = p.assistLevels||{};
-  const vit = p.vitals||{};
+  const safeJoin = (v, sep) => Array.isArray(v) ? v.join(sep) : (typeof v === 'string' ? v : '');
+  const safeStr = (v) => (v === null || v === undefined) ? 'N/A' : (typeof v === 'object' ? JSON.stringify(v) : String(v));
 
-  if(note.type==='Initial Evaluation') {
-    return `PHYSICAL THERAPY INITIAL EVALUATION
-==========================================
-Date: ${note.date}
-Therapist: ${note.author}
-Status: ${note.status}
+  const ggMobLabels = {A:'Roll Left',B:'Roll Right',C:'Sit to Lying',D:'Lying to Sitting on Side of Bed',E:'Sit to Stand',F:'Chair/Bed-to-Chair Transfer',G:'Toilet Transfer',H:'Car Transfer',I:'Walk 10 feet',J:'Walk 50 feet',K:'Walk 150 feet',L:'Walk 10 feet on Uneven Surfaces',M:'1 Step (Curb)',N:'4 Steps',O:'12 Steps',P:'Picking Up Object',R:'Does the patient use a wheelchair/scooter?',S:'Wheel 50 feet with 2 turns'};
+  const ggSCLabels = {A:'Eating',B:'Oral Hygiene',C:'Toileting Hygiene',D:'Shower/Bathe Self',E:'Upper Body Dressing',F:'Lower Body Dressing',G:'Putting On/Taking Off Footwear'};
+  const ggScoreDesc = (s) => {if(s===null||s===undefined)return 'Not assessed';if(s===88)return '88 - Not attempted due to medical condition';if(s===9)return '09 - Not applicable';const descs={1:'Dependent',2:'Substantial/Maximal Assistance',3:'Partial/Moderate Assistance',4:'Supervision/Touching Assistance',5:'Setup or Clean-up Assistance',6:'Independent'};return s + ' - ' + (descs[s]||'Score '+s)};
 
-PATIENT INFORMATION:
-  Name: ${p.firstName} ${p.lastName}
-  DOB: ${p.dob}   Age: ${p.age}   Gender: ${p.gender}
-  MRN: ${p.mrn}   Room: ${p.roomNum}   Unit: ${p.unit}
-  Attending MD: ${p.attendingMD}
-  Admit Date: ${p.admitDate}
-  Diagnosis: ${p.dx} (${p.dxCode})
-  Admit Reason: ${p.admitReason||'See diagnosis'}
-  Precautions: ${safeJoin(p.precautions,", ")||'None noted'}
-  WB Status: ${p.wbStatus||'WBAT'}
-  Code Status: ${p.codeStatus||'Full code'}
-  Lines/Tubes: ${safeJoin(p.lines,", ")||'None'}
+  const dateNum = note.date ? note.date.split('-').join('') : '20260301';
+  const seed = parseInt(dateNum) % 100;
+  const pick = (arr) => arr[seed % arr.length];
 
-PAST MEDICAL HISTORY:
-  ${safeJoin(p.pmh,", ")||'None reported'}
+  const vit = p.vitals || {};
+  const vitalsStr = 'HR: ' + (vit.hr || 'N/A') + ' bpm  |  BP: ' + (vit.bp_sys && vit.bp_dia ? vit.bp_sys + '/' + vit.bp_dia : 'N/A') + ' mmHg  |  RR: ' + (vit.rr || 'N/A') + '  |  SpO2: ' + (vit.spo2 || 'N/A') + '%  |  Temp: ' + (vit.temp || 'N/A') + String.fromCharCode(176) + 'F  |  O2: ' + (vit.o2_device || 'Room Air');
 
-PRIOR LEVEL OF FUNCTION:
-  ${p.priorFunction||'Independent with all ADLs and mobility'}
-  Prior Devices: ${safeJoin(p.priorDevices,", ")||'None'}
+  const al = p.assistLevels || {};
+  const formatAssistSection = (section, title) => {
+    if (!section || typeof section !== 'object') return '  ' + title + ': N/A';
+    const lines = ['  ' + title + ':'];
+    for (const [key, val] of Object.entries(section)) {
+      const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
+      lines.push('    - ' + label + ': ' + safeStr(val));
+    }
+    return lines.join('\n');
+  };
 
-VITALS AT EVAL:
-  BP: ${vit.bp||'N/A'}  HR: ${vit.hr||'N/A'}  RR: ${vit.rr||'N/A'}  SpO2: ${vit.spo2||'N/A'}  Temp: ${vit.temp||'N/A'}
+  const sh = p.socialHistory || {};
+  const socialStr = [
+    '  Living Situation: ' + (sh.living || 'N/A'),
+    '  Prior Mobility: ' + (sh.priorMobility || 'N/A'),
+    '  Stairs at Home: ' + (sh.stairs || 'N/A'),
+    '  Occupation: ' + (sh.occupation || 'N/A'),
+    '  Emergency Contact: ' + (sh.emergencyContact || 'N/A')
+  ].join('\n');
 
-OBJECTIVE FINDINGS:
-  Cognition: ${p.cognition||'Alert and oriented x4'}
-  Bed Mobility: ${als.bedMobility||'Min A'}
-  Transfers: ${als.transfers||'Min A'}
-  Gait: ${als.gait||'CGA'}
-  Stairs: ${als.stairs||'Not assessed'}
+  const pf = p.priorFunction || {};
+  const pfDescs = {1:'Dependent',2:'Substantial Assist',3:'Partial Assist',4:'Supervision',5:'Setup',6:'Independent'};
+  const priorFuncStr = [
+    '  Self-Care: ' + (pfDescs[pf.selfCare] || pf.selfCare || 'N/A'),
+    '  Indoor Mobility: ' + (pfDescs[pf.indoorMobility] || pf.indoorMobility || 'N/A'),
+    '  Stairs: ' + (pfDescs[pf.stairs] || pf.stairs || 'N/A'),
+    '  Cognition: ' + (pfDescs[pf.cognition] || pf.cognition || 'N/A')
+  ].join('\n');
 
-  GG Mobility Score: ${p.ggMobility||'N/A'}
-  GG Self-Care Score: ${p.ggSelfCare||'N/A'}
+  const cog = p.cognition || {};
+  const cogStr = [
+    '  Orientation: ' + (cog.oriented || 'N/A'),
+    '  Command Following: ' + (cog.followsCommands || 'N/A'),
+    '  Safety Awareness: ' + (cog.safety || 'N/A')
+  ].join('\n');
 
-ASSESSMENT:
-  Patient is a ${p.age} y/o ${p.gender} admitted for ${p.admitReason||p.dx} presenting with impaired functional mobility, balance deficits, and decreased independence with ADLs. Patient would benefit from skilled PT services to improve functional mobility, balance, strength, and safety for discharge.
+  const formatGG = (ggData, labels, title) => {
+    if (!ggData || typeof ggData !== 'object') return title + ': Not assessed';
+    const lines = [title + ':'];
+    for (const [key, label] of Object.entries(labels)) {
+      const item = ggData[key];
+      if (item) {
+        lines.push('  ' + key + '. ' + label + ':  Adm: ' + ggScoreDesc(item.admission) + '  |  Goal: ' + ggScoreDesc(item.goal) + (item.discharge !== null ? '  |  DC: ' + ggScoreDesc(item.discharge) : ''));
+      }
+    }
+    return lines.join('\n');
+  };
 
-PLAN:
-  - PT 5-6x/week per acute rehab protocol
-  - Focus: functional mobility training, balance, strengthening, gait training
-  - Discharge recommendation: ${p.dcRecommendation||'Home with HH services'}
-  - Estimated LOS: 10-14 days`;
+  const linesStr = Array.isArray(p.lines) && p.lines.length > 0 ? p.lines.join(', ') : 'None';
+
+  const header = [
+    '========================================================================',
+    '                    REHABFLOW INPATIENT EMR',
+    '                    Physical Therapy Department',
+    '========================================================================',
+    '',
+    'PATIENT: ' + p.firstName + ' ' + p.lastName + '    MRN: ' + (p.mrn || 'N/A') + '    DOB: ' + (p.dob || 'N/A'),
+    'Age: ' + (p.age || 'N/A') + '    Gender: ' + (p.gender || 'N/A') + '    Room: ' + (p.roomNum || 'N/A') + ' - ' + (p.unit || 'N/A'),
+    'Attending MD: ' + (p.attendingMD || 'N/A'),
+    'Admit Date: ' + (p.admitDate || 'N/A') + '    LOS Day: ' + (p.losDay || 'N/A'),
+    'Code Status: ' + (p.codeStatus || 'N/A') + '    Weight Bearing: ' + (p.wbStatus || 'N/A'),
+    '',
+    'Note Type: ' + (note.type || 'Clinical Note'),
+    'Date of Service: ' + (note.date || 'N/A'),
+    'Author: ' + (note.author || 'N/A'),
+    'Status: ' + (note.status || 'Draft'),
+    '------------------------------------------------------------------------'
+  ].join('\n');
+
+  const noteType = (note.type || '').toLowerCase();
+
+  if (noteType.includes('initial eval') || noteType.includes('evaluation')) {
+    const subjectives = [
+      'Patient reports pain at ' + (3 + seed % 5) + '/10 at rest, ' + (5 + seed % 4) + '/10 with activity.',
+      'Patient states "I want to get back home as soon as possible."',
+      'Patient endorses difficulty with mobility and transfers since admission.',
+      'Patient reports feeling ' + pick(['weak','stiff','sore','dizzy with position changes']) + ' and has ' + pick(['fair','poor','good']) + ' appetite.'
+    ];
+
+    return header + '\n\n' + [
+      'PHYSICAL THERAPY INITIAL EVALUATION',
+      '========================================================================',
+      '',
+      'REFERRAL INFORMATION:',
+      '  Referring Physician: ' + (p.attendingMD || 'N/A'),
+      '  Referral Date: ' + (p.admitDate || 'N/A'),
+      '  Diagnosis: ' + (p.dx || 'N/A'),
+      '  ICD-10: ' + (p.dxCode || 'N/A'),
+      '  Reason for Referral: ' + (p.admitReason || p.dx || 'PT evaluation and treatment'),
+      '',
+      'PRECAUTIONS/CONTRAINDICATIONS:',
+      '  ' + safeJoin(p.precautions, ', '),
+      '  Weight Bearing Status: ' + (p.wbStatus || 'N/A'),
+      '  Lines/Tubes: ' + linesStr,
+      '  Alerts: ' + safeJoin(p.alerts, ', '),
+      '',
+      'SUBJECTIVE:',
+      '  ' + subjectives.join('\n  '),
+      '',
+      'PAST MEDICAL HISTORY:',
+      '  ' + safeStr(p.pmh),
+      '',
+      'CURRENT MEDICATIONS:',
+      '  ' + safeStr(p.meds),
+      '',
+      'SOCIAL HISTORY:',
+      socialStr,
+      '',
+      'PRIOR LEVEL OF FUNCTION:',
+      priorFuncStr,
+      '  Prior Assistive Devices: ' + (p.priorDevices ? Object.entries(p.priorDevices).filter(([k,v]) => v).map(([k]) => k.replace(/([A-Z])/g, ' $1')).join(', ') || 'None reported' : 'N/A'),
+      '',
+      'VITALS AT EVALUATION:',
+      '  ' + vitalsStr,
+      '',
+      'COGNITION/COMMUNICATION:',
+      cogStr,
+      '',
+      'OBJECTIVE - FUNCTIONAL MOBILITY ASSESSMENT:',
+      '',
+      formatAssistSection(al.bedMobility, 'BED MOBILITY'),
+      '',
+      formatAssistSection(al.transfers, 'TRANSFERS'),
+      '',
+      formatAssistSection(al.gait, 'GAIT'),
+      '',
+      formatAssistSection(al.stairs, 'STAIRS'),
+      '',
+      'SECTION GG - FUNCTIONAL ABILITIES:',
+      '',
+      formatGG(p.ggMobility, ggMobLabels, 'GG MOBILITY ITEMS'),
+      '',
+      formatGG(p.ggSelfCare, ggSCLabels, 'GG SELF-CARE ITEMS'),
+      '',
+      'ASSESSMENT:',
+      '  ' + p.firstName + ' ' + p.lastName + ' is a ' + (p.age || '') + ' y/o ' + (p.gender || '') + ' admitted on ' + (p.admitDate || 'N/A'),
+      '  with ' + (p.dx || 'N/A') + '. Patient presents with impaired',
+      '  functional mobility, decreased strength, and activity limitations requiring',
+      '  skilled physical therapy intervention. Patient demonstrates ' + pick(['good','fair','excellent']),
+      '  rehabilitation potential based on ' + pick(['prior level of function, motivation, and cognitive status.','willingness to participate, support system, and medical stability.','motivation, medical progress, and family support.']),
+      '',
+      '  Skilled PT services are medically necessary to address deficits in:',
+      '    - Functional mobility (bed mobility, transfers, gait)',
+      '    - Balance and safety',
+      '    - Endurance and activity tolerance',
+      '    - Patient/family education for safe discharge',
+      '',
+      'PLAN OF CARE:',
+      '  Frequency: ' + pick(['5x/week','6x/week','Daily']) + ' for ' + pick(['2-3 weeks','10-14 days','duration of stay']),
+      '  Short-Term Goals (1 week):',
+      '    1. Patient will perform supine-to-sit with ' + pick(['supervision','CGA','min assist']) + ' for safety',
+      '    2. Patient will ambulate ' + pick(['50','75','100']) + ' feet with ' + pick(['FWW','RW','SPC']) + ' and ' + pick(['CGA','supervision','min assist']),
+      '    3. Patient will perform sit-to-stand with ' + pick(['CGA','supervision','min assist']),
+      '  Long-Term Goals (at discharge):',
+      '    1. Patient will perform all transfers with ' + pick(['supervision','modified independence','setup assist']) + ' for safe discharge',
+      '    2. Patient will ambulate ' + pick(['150','200','250']) + '+ feet with least restrictive device and ' + pick(['supervision','modified independence']),
+      '    3. Patient will negotiate ' + pick(['4','6','8']) + ' steps with ' + pick(['supervision','CGA']) + ' and railing',
+      '    4. Patient will demonstrate independence with home exercise program',
+      '',
+      '  Discharge Recommendation: ' + (p.dcRecommendation || 'To be determined'),
+      '',
+      '========================================================================',
+      'Electronically signed by: ' + (note.author || 'N/A'),
+      'Date/Time: ' + (note.date || 'N/A') + ' ' + pick(['08:30','09:15','10:00','10:45','11:30','14:00','14:30','15:15']),
+      '========================================================================'
+    ].join('\n');
   }
 
-  if(note.type==='Daily Treatment Note') {
-    return `PHYSICAL THERAPY DAILY TREATMENT NOTE
-==========================================
-Date: ${note.date}
-Therapist: ${note.author}
-Status: ${note.status}
+  if (noteType.includes('treatment') || noteType.includes('daily')) {
+    const txMinutes = 30 + (seed % 4) * 5;
+    const activities = [
+      'Therapeutic exercise: ' + pick(['AROM/AAROM','strengthening','functional mobility training']) + ' x ' + pick(['10','12','15']) + ' min',
+      'Gait training: ' + pick(['level surfaces','varied surfaces','with obstacle negotiation']) + ' x ' + pick(['10','12','15']) + ' min, ' + pick(['50','75','100','125','150']) + ' ft with ' + pick(['FWW','RW','SPC','no device']),
+      'Transfer training: ' + pick(['sit-to-stand','bed-to-chair','toilet transfer','car transfer']) + ' x ' + pick(['5','8','10']) + ' min',
+      pick(['Balance training: static/dynamic standing','Stair training: ' + pick(['4','6','8']) + ' steps with railing','Neuromuscular re-education: weight shifting, postural control']) + ' x ' + pick(['5','8','10']) + ' min',
+      'Patient/caregiver education: ' + pick(['HEP review','fall prevention','energy conservation','safe transfer techniques'])
+    ];
+    const response = pick([
+      'Patient tolerated treatment well with minimal complaints.',
+      'Patient tolerated session with moderate fatigue noted at end.',
+      'Patient demonstrated good effort and participation throughout session.',
+      'Patient required frequent rest breaks secondary to decreased endurance.',
+      'Patient tolerated treatment well, reporting decreased pain compared to prior session.'
+    ]);
+    const progress = pick([
+      'Patient showing steady improvement in functional mobility.',
+      'Patient making good progress toward short-term goals.',
+      'Patient demonstrating improved endurance and activity tolerance.',
+      'Functional gains noted in transfer ability and gait distance.',
+      'Patient progressing well; anticipate meeting discharge goals within ' + pick(['3-5','5-7','7-10']) + ' days.'
+    ]);
 
-Patient: ${p.firstName} ${p.lastName}   MRN: ${p.mrn}   Room: ${p.roomNum}
-Diagnosis: ${p.dx} (${p.dxCode})
-LOS Day: ${p.losDay||'N/A'}   Tx Session #: ${p.totalTxSessions||'N/A'}
-
-SUBJECTIVE: ${subj}
-
-VITALS (pre-treatment):
-  BP: ${vit.bp||'N/A'}  HR: ${vit.hr||'N/A'}  SpO2: ${vit.spo2||'N/A'}
-
-OBJECTIVE:
-  Bed Mobility: ${als.bedMobility||'Min A'} - Supine to/from sit
-  Transfers: ${als.transfers||'Min A'} - Sit to/from stand at EOB
-  Gait: ${gait}
-  Therapeutic Exercise: LE strengthening - SLR, quad sets, ankle pumps, seated marching x10 reps each
-  Balance Training: Static standing with UE support 30 sec x3 trials
-
-RESPONSE TO TREATMENT:
-  Patient tolerated treatment session well. No adverse events. Vitals stable throughout.
-
-PLAN:
-  Continue PT per plan of care. Progress mobility and gait distance as tolerated.`;
+    return header + '\n\n' + [
+      'PHYSICAL THERAPY DAILY TREATMENT NOTE',
+      '========================================================================',
+      '',
+      'PRECAUTIONS: ' + safeJoin(p.precautions, ', '),
+      'Weight Bearing: ' + (p.wbStatus || 'N/A') + '    Lines: ' + linesStr,
+      '',
+      'VITALS (pre-treatment):',
+      '  ' + vitalsStr,
+      '',
+      'SUBJECTIVE:',
+      '  Patient reports pain ' + (2 + seed % 5) + '/10 today. ' + pick([
+        'States feeling "a little better today."',
+        'Reports sleeping well last night.',
+        'Endorses some stiffness this morning but improved with movement.',
+        'States "I feel stronger than yesterday."',
+        'Reports mild soreness from yesterday\'s session.'
+      ]),
+      '',
+      'OBJECTIVE - TREATMENT PROVIDED:',
+      '  Total Treatment Time: ' + txMinutes + ' minutes (skilled 1:1)',
+      '  CPT Codes: 97110 (Therapeutic Exercise), ' + pick(['97116 (Gait Training)','97530 (Therapeutic Activities)','97542 (Wheelchair Management)']) + ', 97535 (Self-Care/ADL Training)',
+      '',
+      '  Activities:',
+      '    1. ' + activities[0],
+      '    2. ' + activities[1],
+      '    3. ' + activities[2],
+      '    4. ' + activities[3],
+      '    5. ' + activities[4],
+      '',
+      'FUNCTIONAL STATUS UPDATE:',
+      '  Bed Mobility: ' + (al.bedMobility ? (al.bedMobility.supineToSit || 'N/A') + ' (supine-to-sit), ' + (al.bedMobility.sitToSupine || 'N/A') + ' (sit-to-supine)' : 'See initial eval'),
+      '  Transfers: ' + (al.transfers ? (al.transfers.sitToStand || 'N/A') + ' (sit-to-stand), ' + (al.transfers.bedToChair || 'N/A') + ' (bed-to-chair)' : 'See initial eval'),
+      '  Gait: ' + (al.gait ? (al.gait.levelSurfaces || 'N/A') + ' on level, ' + (al.gait.distance || 'N/A') + ' with ' + (al.gait.assistDevice || 'N/A') : 'See initial eval'),
+      '  Stairs: ' + (al.stairs ? (al.stairs.stairsUp || 'N/A') + ' ascending, ' + (al.stairs.stairsDown || 'N/A') + ' descending' : 'See initial eval'),
+      '',
+      'RESPONSE TO TREATMENT:',
+      '  ' + response,
+      '  Vitals post-treatment: HR ' + ((vit.hr || 70) + 8 + seed % 10) + ' bpm, SpO2 ' + (vit.spo2 || 95) + '%, BP stable',
+      '',
+      'ASSESSMENT:',
+      '  ' + progress,
+      '  Patient continues to require skilled PT intervention for functional mobility,',
+      '  balance, strengthening, and safe discharge planning.',
+      '',
+      'PLAN:',
+      '  Continue current POC ' + pick(['5x/week','6x/week','daily']) + '.',
+      '  Focus next session on ' + pick([
+        'progressive gait training and stair negotiation.',
+        'transfer training and dynamic balance activities.',
+        'endurance training and community mobility preparation.',
+        'advanced functional mobility and discharge preparation.',
+        'strengthening and progressive ambulation distance.'
+      ]),
+      '  ' + pick(['Will reassess goals at next progress note.','Continue to monitor vitals and pain with activity.','Will coordinate with nursing re: mobility plan.','Anticipate progress note update within 5-7 days.']),
+      '',
+      '========================================================================',
+      'Electronically signed by: ' + (note.author || 'N/A'),
+      'Date/Time: ' + (note.date || 'N/A') + ' ' + pick(['08:30','09:15','10:00','10:45','11:30','14:00','14:30','15:15']),
+      '========================================================================'
+    ].join('\n');
   }
 
-  if(note.type==='Progress Note') {
-    return `PHYSICAL THERAPY PROGRESS NOTE
-==========================================
-Date: ${note.date}
-Therapist: ${note.author}
-Status: ${note.status}
-
-Patient: ${p.firstName} ${p.lastName}   MRN: ${p.mrn}   Room: ${p.roomNum}
-Diagnosis: ${p.dx} (${p.dxCode})
-LOS Day: ${p.losDay||'N/A'}   Total Tx Sessions: ${p.totalTxSessions||'N/A'}
-
-PROGRESS SUMMARY:
-  ${prog}
-
-CURRENT FUNCTIONAL STATUS:
-  Bed Mobility: ${als.bedMobility||'Min A'}
-  Transfers: ${als.transfers||'Min A'}
-  Gait: ${als.gait||'CGA'}
-  Stairs: ${als.stairs||'Not assessed'}
-
-  GG Mobility Score: ${p.ggMobility||'N/A'}
-  GG Self-Care Score: ${p.ggSelfCare||'N/A'}
-
-GOALS STATUS:
-  1. Bed mobility supervision level - IN PROGRESS
-  2. Transfers modified independent - IN PROGRESS
-  3. Ambulate 300ft with least restrictive device - IN PROGRESS
-  4. Stairs 4-6 steps with rail - NOT YET ADDRESSED
-
-PLAN:
-  Continue skilled PT 5-6x/week. Progress functional mobility. Target DC: ${p.dcRecommendation||'Home with services'}`;
+  if (noteType.includes('progress')) {
+    return header + '\n\n' + [
+      'PHYSICAL THERAPY PROGRESS NOTE',
+      '========================================================================',
+      '',
+      'TREATMENT DIAGNOSIS: ' + (p.dx || 'N/A') + ' (' + (p.dxCode || '') + ')',
+      'CERTIFICATION PERIOD: ' + (p.admitDate || 'N/A') + ' to present',
+      'TOTAL TREATMENT SESSIONS TO DATE: ' + (p.totalTxSessions || 'N/A'),
+      'LOS DAY: ' + (p.losDay || 'N/A'),
+      '',
+      'PRECAUTIONS: ' + safeJoin(p.precautions, ', '),
+      'Weight Bearing: ' + (p.wbStatus || 'N/A'),
+      '',
+      'SUBJECTIVE:',
+      '  Patient reports overall ' + pick(['improvement','gradual improvement','steady progress']) + ' since initial evaluation.',
+      '  Current pain level: ' + (1 + seed % 4) + '/10 at rest, ' + (3 + seed % 4) + '/10 with activity.',
+      '  ' + pick([
+        'Patient states "I feel like I\'m getting stronger every day."',
+        'Patient reports improved confidence with mobility.',
+        'Patient endorses decreased pain and improved function.',
+        'Patient expresses motivation to continue working toward discharge.'
+      ]),
+      '',
+      'OBJECTIVE - CURRENT FUNCTIONAL STATUS:',
+      '',
+      '  COGNITION/COMMUNICATION:',
+      cogStr,
+      '',
+      '  BED MOBILITY:',
+      formatAssistSection(al.bedMobility, '  Current Bed Mobility'),
+      '',
+      '  TRANSFERS:',
+      formatAssistSection(al.transfers, '  Current Transfers'),
+      '',
+      '  GAIT:',
+      formatAssistSection(al.gait, '  Current Gait'),
+      '',
+      '  STAIRS:',
+      formatAssistSection(al.stairs, '  Current Stairs'),
+      '',
+      'SECTION GG - FUNCTIONAL ABILITIES UPDATE:',
+      formatGG(p.ggMobility, ggMobLabels, '  GG Mobility'),
+      '',
+      formatGG(p.ggSelfCare, ggSCLabels, '  GG Self-Care'),
+      '',
+      'GOAL STATUS:',
+      '  Short-Term Goals:',
+      '    1. Transfers with CGA for safety - ' + pick(['MET','PARTIALLY MET','PROGRESSING']),
+      '    2. Ambulate 75 ft with assistive device - ' + pick(['MET','PARTIALLY MET','PROGRESSING']),
+      '    3. Sit-to-stand with CGA - ' + pick(['MET','PARTIALLY MET','PROGRESSING']),
+      '  Long-Term Goals:',
+      '    1. All transfers supervision level - ' + pick(['PROGRESSING','ON TRACK','PARTIALLY MET']),
+      '    2. Ambulate 200+ ft least restrictive device - ' + pick(['PROGRESSING','ON TRACK','PARTIALLY MET']),
+      '    3. Stair negotiation with supervision - ' + pick(['PROGRESSING','ON TRACK','PARTIALLY MET']),
+      '    4. Independent with HEP - ' + pick(['PROGRESSING','ON TRACK','PARTIALLY MET']),
+      '',
+      'ASSESSMENT:',
+      '  ' + p.firstName + ' ' + p.lastName + ' is a ' + (p.age || '') + ' y/o ' + (p.gender || '') + ' who has been receiving',
+      '  PT services for ' + (p.totalTxSessions || 'multiple') + ' sessions since ' + (p.admitDate || 'admission') + '.',
+      '  Patient demonstrates ' + pick(['good','fair to good','excellent']) + ' progress toward established goals.',
+      '  ' + pick([
+        'Functional mobility has improved across all domains since initial evaluation.',
+        'Patient is making steady gains in strength, endurance, and functional mobility.',
+        'Notable improvements in transfer ability and gait distance since last progress note.',
+        'Patient continues to show good rehabilitation potential with consistent participation.'
+      ]),
+      '  Continued skilled PT is medically necessary to ' + pick([
+        'progress functional mobility to discharge-safe levels.',
+        'achieve discharge goals and ensure safe community re-entry.',
+        'maximize functional independence prior to discharge.'
+      ]),
+      '',
+      'PLAN:',
+      '  Continue PT ' + pick(['5x/week','6x/week','daily']) + ' with focus on:',
+      '    - Progressive gait training (distance and varied surfaces)',
+      '    - Transfer independence',
+      '    - Stair negotiation',
+      '    - Balance and safety training',
+      '    - Discharge planning and HEP instruction',
+      '  Anticipated Discharge: ' + (p.dcRecommendation || 'TBD'),
+      '  Estimated remaining sessions: ' + pick(['5-7','7-10','3-5','10-14']),
+      '',
+      '========================================================================',
+      'Electronically signed by: ' + (note.author || 'N/A'),
+      'Date/Time: ' + (note.date || 'N/A') + ' ' + pick(['08:30','09:15','10:00','10:45','11:30','14:00','14:30','15:15']),
+      '========================================================================'
+    ].join('\n');
   }
 
-  if(note.type==='Discharge Summary') {
-    return `PHYSICAL THERAPY DISCHARGE SUMMARY
-==========================================
-Date: ${note.date}
-Therapist: ${note.author}
-Status: ${note.status}
-
-Patient: ${p.firstName} ${p.lastName}   MRN: ${p.mrn}   Room: ${p.roomNum}
-Diagnosis: ${p.dx} (${p.dxCode})
-Admit Date: ${p.admitDate}   Total LOS Days: ${p.losDay||'N/A'}
-Total PT Sessions: ${p.totalTxSessions||'N/A'}
-
-DISCHARGE FUNCTIONAL STATUS:
-  Bed Mobility: ${als.bedMobility||'Supervision'}
-  Transfers: ${als.transfers||'Supervision'}
-  Gait: ${als.gait||'Supervision'}
-  Stairs: ${als.stairs||'Min A with rail'}
-
-DISCHARGE DISPOSITION: ${p.dcRecommendation||'Home with home health PT'}
-
-RECOMMENDATIONS:
-  - Continue outpatient or home health PT 2-3x/week
-  - Home exercise program provided and reviewed with patient
-  - Follow up with ${p.attendingMD||'PCP'} as scheduled
-  - DME: Rolling walker for household and community mobility`;
+  if (noteType.includes('discharge')) {
+    return header + '\n\n' + [
+      'PHYSICAL THERAPY DISCHARGE SUMMARY',
+      '========================================================================',
+      '',
+      'TREATMENT DIAGNOSIS: ' + (p.dx || 'N/A') + ' (' + (p.dxCode || '') + ')',
+      'ADMISSION DATE: ' + (p.admitDate || 'N/A'),
+      'DISCHARGE DATE: ' + (note.date || 'N/A'),
+      'TOTAL LENGTH OF STAY: ' + (p.losDay || 'N/A') + ' days',
+      'TOTAL PT SESSIONS: ' + (p.totalTxSessions || 'N/A'),
+      '',
+      'DISCHARGE DISPOSITION: ' + (p.dcRecommendation || 'N/A'),
+      '',
+      'REASON FOR DISCHARGE:',
+      '  ' + pick([
+        'Patient has met established discharge goals and is safe for discharge.',
+        'Patient has made sufficient progress to transition to next level of care.',
+        'Patient has met functional goals for safe discharge to recommended setting.'
+      ]),
+      '',
+      'FUNCTIONAL STATUS AT DISCHARGE:',
+      '',
+      '  BED MOBILITY:',
+      formatAssistSection(al.bedMobility, '  Discharge Bed Mobility'),
+      '',
+      '  TRANSFERS:',
+      formatAssistSection(al.transfers, '  Discharge Transfers'),
+      '',
+      '  GAIT:',
+      formatAssistSection(al.gait, '  Discharge Gait'),
+      '',
+      '  STAIRS:',
+      formatAssistSection(al.stairs, '  Discharge Stairs'),
+      '',
+      'GOAL OUTCOMES:',
+      '  Short-Term Goals: ' + pick(['All met','3 of 3 met','2 of 3 met, 1 partially met']),
+      '  Long-Term Goals: ' + pick(['All met','3 of 4 met','Majority met']),
+      '',
+      'SECTION GG - DISCHARGE SCORES:',
+      formatGG(p.ggMobility, ggMobLabels, '  GG Mobility'),
+      '',
+      formatGG(p.ggSelfCare, ggSCLabels, '  GG Self-Care'),
+      '',
+      'DISCHARGE INSTRUCTIONS:',
+      '  1. Continue home exercise program as instructed (written copy provided)',
+      '  2. ' + pick(['Follow up with orthopedics in 2 weeks','Follow up with PCP in 1 week','Continue outpatient PT 2-3x/week']),
+      '  3. Use ' + (al.gait && al.gait.assistDevice ? al.gait.assistDevice : 'assistive device') + ' for all ambulation',
+      '  4. Observe ' + (p.wbStatus || 'weight bearing') + ' precautions as directed by physician',
+      '  5. Call physician if experiencing increased pain, swelling, fever, or difficulty breathing',
+      '',
+      'HOME EXERCISE PROGRAM PROVIDED: Yes',
+      '  - ' + pick(['Ankle pumps, quad sets, glute sets','Seated knee extensions, hip flexion, ankle pumps','Bed-level exercises: bridges, SLR, clamshells']),
+      '  - ' + pick(['Standing balance exercises at kitchen counter','Seated UE/LE stretching program','Walking program: start with 5 min, increase as tolerated']),
+      '  - Frequency: ' + pick(['2x/day','3x/day','2-3x/day']),
+      '',
+      'PATIENT/FAMILY EDUCATION:',
+      '  Education provided on: fall prevention, safe transfers, HEP, activity pacing,',
+      '  and when to seek medical attention. Patient/family verbalized understanding.',
+      '',
+      '========================================================================',
+      'Electronically signed by: ' + (note.author || 'N/A'),
+      'Date/Time: ' + (note.date || 'N/A') + ' ' + pick(['08:30','09:15','10:00','10:45','11:30','14:00','14:30','15:15']),
+      '========================================================================'
+    ].join('\n');
   }
 
-  return `CLINICAL NOTE
-==========================================
-Date: ${note.date}
-Type: ${note.type}
-Author: ${note.author}
-Status: ${note.status}
-
-Patient: ${p.firstName} ${p.lastName}
-Diagnosis: ${p.dx} (${p.dxCode})
-
-[Note content for this note type]`;
+  // FALLBACK
+  return header + '\n\n' + [
+    'CLINICAL NOTE - ' + (note.type || 'General').toUpperCase(),
+    '========================================================================',
+    '',
+    'DIAGNOSIS: ' + (p.dx || 'N/A') + ' (' + (p.dxCode || '') + ')',
+    'PRECAUTIONS: ' + safeJoin(p.precautions, ', '),
+    'Weight Bearing: ' + (p.wbStatus || 'N/A'),
+    '',
+    'VITALS:',
+    '  ' + vitalsStr,
+    '',
+    'SUBJECTIVE:',
+    '  Patient seen for skilled PT services. Reports ' + pick(['improved function','stable symptoms','gradual improvement']) + '.',
+    '',
+    'OBJECTIVE:',
+    '  Bed Mobility: ' + (al.bedMobility ? al.bedMobility.supineToSit || 'N/A' : 'N/A'),
+    '  Transfers: ' + (al.transfers ? al.transfers.sitToStand || 'N/A' : 'N/A'),
+    '  Gait: ' + (al.gait ? (al.gait.distance || '') + ' with ' + (al.gait.assistDevice || 'N/A') : 'N/A'),
+    '',
+    'ASSESSMENT:',
+    '  Patient continues to require skilled PT for functional mobility deficits.',
+    '',
+    'PLAN:',
+    '  Continue POC as established.',
+    '',
+    '========================================================================',
+    'Electronically signed by: ' + (note.author || 'N/A'),
+    'Date/Time: ' + (note.date || 'N/A'),
+    '========================================================================'
+  ].join('\n');
 }
 
 function DocumentsTab({ patient }) {
