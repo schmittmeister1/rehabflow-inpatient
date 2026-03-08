@@ -1396,30 +1396,209 @@ function ProgressNote({ patient, user }) {
 }
 
 // ==================== DOCUMENTS TAB ====================
-function DocumentsTab({ patient }) {
-  return (
-    <div>
-      <h4 style={{marginBottom:12}}>Document History {'\u2014'} {patient.noteHistory.length} notes</h4>
-      <table className="data-table">
-        <thead><tr><th>Type</th><th>Date</th><th>Author</th><th>Status</th><th>Action</th></tr></thead>
-        <tbody>
-          {patient.noteHistory.map((n,i) => (
-            <tr key={i}>
-              <td style={{fontWeight:600}}>{n.type}</td>
-              <td>{n.date}</td>
-              <td>{n.author}</td>
-              <td><span className={`badge ${n.status==='Draft'?'badge-yellow':n.status.includes('Co-sign')?'badge-blue':'badge-green'}`}>{n.status}</span></td>
-              <td><button className="btn btn-sm btn-outline">View</button></td>
-            </tr>
-          ))}
-          {patient.noteHistory.length === 0 && (
-            <tr><td colSpan={5} style={{textAlign:'center',padding:20,color:'var(--text-muted)'}}>No notes documented yet. This is a new admission.</td></tr>
-          )}
-        </tbody>
-      </table>
-    </div>
-  );
+function generateNoteContent(note, patient) {
+  const p = patient;
+  const subjectives = ['Patient reports feeling better today.','Patient reports mild soreness.','Patient tolerated treatment well.','Patient reports increased pain overnight.','Patient is motivated and engaged.','Patient reports difficulty sleeping due to pain.','Patient notes gradual improvement.'];
+  const gaitDescs = ['Ambulated 150ft with rolling walker, CGA on level surfaces.','Ambulated 200ft with front-wheeled walker, supervision level.','Ambulated 100ft in hallway with rolling walker, min assist for balance.','Ambulated 250ft with single point cane, modified independent.','Ambulated 50ft bedside to bathroom with rolling walker, mod assist x1.'];
+  const progressNotes = ['Patient demonstrating steady progress toward functional goals.','Patient showing gradual improvement in functional mobility.','Patient making good progress, responding well to interventions.','Patient progressing slower than expected, may need adjusted plan.'];
+  const subj = subjectives[Math.floor(Math.random()*subjectives.length)];
+  const gait = gaitDescs[Math.floor(Math.random()*gaitDescs.length)];
+  const prog = progressNotes[Math.floor(Math.random()*progressNotes.length)];
+  const als = p.assistLevels||{};
+  const vit = p.vitals||{};
+
+  if(note.type==='Initial Evaluation') {
+    return `PHYSICAL THERAPY INITIAL EVALUATION
+==========================================
+Date: ${note.date}
+Therapist: ${note.author}
+Status: ${note.status}
+
+PATIENT INFORMATION:
+  Name: ${p.firstName} ${p.lastName}
+  DOB: ${p.dob}   Age: ${p.age}   Gender: ${p.gender}
+  MRN: ${p.mrn}   Room: ${p.roomNum}   Unit: ${p.unit}
+  Attending MD: ${p.attendingMD}
+  Admit Date: ${p.admitDate}
+  Diagnosis: ${p.dx} (${p.dxCode})
+  Admit Reason: ${p.admitReason||'See diagnosis'}
+  Precautions: ${(p.precautions||[]).join(', ')||'None noted'}
+  WB Status: ${p.wbStatus||'WBAT'}
+  Code Status: ${p.codeStatus||'Full code'}
+  Lines/Tubes: ${(p.lines||[]).join(', ')||'None'}
+
+PAST MEDICAL HISTORY:
+  ${(p.pmh||[]).join(', ')||'None reported'}
+
+PRIOR LEVEL OF FUNCTION:
+  ${p.priorFunction||'Independent with all ADLs and mobility'}
+  Prior Devices: ${(p.priorDevices||[]).join(', ')||'None'}
+
+VITALS AT EVAL:
+  BP: ${vit.bp||'N/A'}  HR: ${vit.hr||'N/A'}  RR: ${vit.rr||'N/A'}  SpO2: ${vit.spo2||'N/A'}  Temp: ${vit.temp||'N/A'}
+
+OBJECTIVE FINDINGS:
+  Cognition: ${p.cognition||'Alert and oriented x4'}
+  Bed Mobility: ${als.bedMobility||'Min A'}
+  Transfers: ${als.transfers||'Min A'}
+  Gait: ${als.gait||'CGA'}
+  Stairs: ${als.stairs||'Not assessed'}
+
+  GG Mobility Score: ${p.ggMobility||'N/A'}
+  GG Self-Care Score: ${p.ggSelfCare||'N/A'}
+
+ASSESSMENT:
+  Patient is a ${p.age} y/o ${p.gender} admitted for ${p.admitReason||p.dx} presenting with impaired functional mobility, balance deficits, and decreased independence with ADLs. Patient would benefit from skilled PT services to improve functional mobility, balance, strength, and safety for discharge.
+
+PLAN:
+  - PT 5-6x/week per acute rehab protocol
+  - Focus: functional mobility training, balance, strengthening, gait training
+  - Discharge recommendation: ${p.dcRecommendation||'Home with HH services'}
+  - Estimated LOS: 10-14 days`;
+  }
+
+  if(note.type==='Daily Treatment Note') {
+    return `PHYSICAL THERAPY DAILY TREATMENT NOTE
+==========================================
+Date: ${note.date}
+Therapist: ${note.author}
+Status: ${note.status}
+
+Patient: ${p.firstName} ${p.lastName}   MRN: ${p.mrn}   Room: ${p.roomNum}
+Diagnosis: ${p.dx} (${p.dxCode})
+LOS Day: ${p.losDay||'N/A'}   Tx Session #: ${p.totalTxSessions||'N/A'}
+
+SUBJECTIVE: ${subj}
+
+VITALS (pre-treatment):
+  BP: ${vit.bp||'N/A'}  HR: ${vit.hr||'N/A'}  SpO2: ${vit.spo2||'N/A'}
+
+OBJECTIVE:
+  Bed Mobility: ${als.bedMobility||'Min A'} - Supine to/from sit
+  Transfers: ${als.transfers||'Min A'} - Sit to/from stand at EOB
+  Gait: ${gait}
+  Therapeutic Exercise: LE strengthening - SLR, quad sets, ankle pumps, seated marching x10 reps each
+  Balance Training: Static standing with UE support 30 sec x3 trials
+
+RESPONSE TO TREATMENT:
+  Patient tolerated treatment session well. No adverse events. Vitals stable throughout.
+
+PLAN:
+  Continue PT per plan of care. Progress mobility and gait distance as tolerated.`;
+  }
+
+  if(note.type==='Progress Note') {
+    return `PHYSICAL THERAPY PROGRESS NOTE
+==========================================
+Date: ${note.date}
+Therapist: ${note.author}
+Status: ${note.status}
+
+Patient: ${p.firstName} ${p.lastName}   MRN: ${p.mrn}   Room: ${p.roomNum}
+Diagnosis: ${p.dx} (${p.dxCode})
+LOS Day: ${p.losDay||'N/A'}   Total Tx Sessions: ${p.totalTxSessions||'N/A'}
+
+PROGRESS SUMMARY:
+  ${prog}
+
+CURRENT FUNCTIONAL STATUS:
+  Bed Mobility: ${als.bedMobility||'Min A'}
+  Transfers: ${als.transfers||'Min A'}
+  Gait: ${als.gait||'CGA'}
+  Stairs: ${als.stairs||'Not assessed'}
+
+  GG Mobility Score: ${p.ggMobility||'N/A'}
+  GG Self-Care Score: ${p.ggSelfCare||'N/A'}
+
+GOALS STATUS:
+  1. Bed mobility supervision level - IN PROGRESS
+  2. Transfers modified independent - IN PROGRESS
+  3. Ambulate 300ft with least restrictive device - IN PROGRESS
+  4. Stairs 4-6 steps with rail - NOT YET ADDRESSED
+
+PLAN:
+  Continue skilled PT 5-6x/week. Progress functional mobility. Target DC: ${p.dcRecommendation||'Home with services'}`;
+  }
+
+  if(note.type==='Discharge Summary') {
+    return `PHYSICAL THERAPY DISCHARGE SUMMARY
+==========================================
+Date: ${note.date}
+Therapist: ${note.author}
+Status: ${note.status}
+
+Patient: ${p.firstName} ${p.lastName}   MRN: ${p.mrn}   Room: ${p.roomNum}
+Diagnosis: ${p.dx} (${p.dxCode})
+Admit Date: ${p.admitDate}   Total LOS Days: ${p.losDay||'N/A'}
+Total PT Sessions: ${p.totalTxSessions||'N/A'}
+
+DISCHARGE FUNCTIONAL STATUS:
+  Bed Mobility: ${als.bedMobility||'Supervision'}
+  Transfers: ${als.transfers||'Supervision'}
+  Gait: ${als.gait||'Supervision'}
+  Stairs: ${als.stairs||'Min A with rail'}
+
+DISCHARGE DISPOSITION: ${p.dcRecommendation||'Home with home health PT'}
+
+RECOMMENDATIONS:
+  - Continue outpatient or home health PT 2-3x/week
+  - Home exercise program provided and reviewed with patient
+  - Follow up with ${p.attendingMD||'PCP'} as scheduled
+  - DME: Rolling walker for household and community mobility`;
+  }
+
+  return `CLINICAL NOTE
+==========================================
+Date: ${note.date}
+Type: ${note.type}
+Author: ${note.author}
+Status: ${note.status}
+
+Patient: ${p.firstName} ${p.lastName}
+Diagnosis: ${p.dx} (${p.dxCode})
+
+[Note content for this note type]`;
 }
+
+function DocumentsTab({ patient }) {
+  const [viewingNote, setViewingNote] = React.useState(null);
+  return React.createElement('div', {style:{padding:'20px'}},
+    React.createElement('h2', {style:{fontSize:'20px',fontWeight:'600',marginBottom:'16px',color:'#1e293b'}}, 'Documents & Notes'),
+    (!patient.noteHistory||patient.noteHistory.length===0)
+      ? React.createElement('div', {style:{padding:'40px',textAlign:'center',color:'#94a3b8',background:'#f8fafc',borderRadius:'8px'}},
+          React.createElement('div', {style:{fontSize:'32px',marginBottom:'8px'}}, String.fromCodePoint(0x1F4C4)),
+          React.createElement('p', null, 'No notes documented yet.'))
+      : React.createElement('table', {style:{width:'100%',borderCollapse:'collapse',background:'#fff',borderRadius:'8px',overflow:'hidden',boxShadow:'0 1px 3px rgba(0,0,0,0.1)'}},
+          React.createElement('thead', null,
+            React.createElement('tr', {style:{background:'#f1f5f9'}},
+              React.createElement('th', {style:{padding:'10px 12px',textAlign:'left',fontWeight:'600',color:'#475569'}}, 'Type'),
+              React.createElement('th', {style:{padding:'10px 12px',textAlign:'left',fontWeight:'600',color:'#475569'}}, 'Date'),
+              React.createElement('th', {style:{padding:'10px 12px',textAlign:'left',fontWeight:'600',color:'#475569'}}, 'Author'),
+              React.createElement('th', {style:{padding:'10px 12px',textAlign:'left',fontWeight:'600',color:'#475569'}}, 'Status'),
+              React.createElement('th', {style:{padding:'10px 12px',textAlign:'left',fontWeight:'600',color:'#475569'}}, 'Action'))),
+          React.createElement('tbody', null,
+            patient.noteHistory.map((n,i) =>
+              React.createElement('tr', {key:i, style:{borderBottom:'1px solid #e2e8f0'}},
+                React.createElement('td', {style:{padding:'10px 12px',fontWeight:'500'}}, n.type),
+                React.createElement('td', {style:{padding:'10px 12px',color:'#64748b'}}, n.date),
+                React.createElement('td', {style:{padding:'10px 12px',color:'#64748b'}}, n.author),
+                React.createElement('td', {style:{padding:'10px 12px'}},
+                  React.createElement('span', {style:{padding:'2px 8px',borderRadius:'12px',fontSize:'11px',fontWeight:'500',
+                    background: n.status==='Signed'?'#dcfce7':n.status==='Co-Signed'?'#dbeafe':'#fef9c3',
+                    color: n.status==='Signed'?'#166534':n.status==='Co-Signed'?'#1e40af':'#854d0e'}}, n.status)),
+                React.createElement('td', {style:{padding:'10px 12px'}},
+                  React.createElement('button', {onClick:()=>setViewingNote(n), style:{padding:'4px 12px',fontSize:'12px',border:'1px solid #3b82f6',borderRadius:'6px',background:'#fff',color:'#3b82f6',cursor:'pointer',fontWeight:'500'}}, 'View')))))),
+    viewingNote && React.createElement('div', {style:{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:10000,display:'flex',alignItems:'center',justifyContent:'center',padding:'20px'}, onClick:()=>setViewingNote(null)},
+      React.createElement('div', {style:{background:'#fff',borderRadius:'12px',width:'100%',maxWidth:'800px',maxHeight:'90vh',display:'flex',flexDirection:'column',boxShadow:'0 25px 50px rgba(0,0,0,0.25)'}, onClick:e=>e.stopPropagation()},
+        React.createElement('div', {style:{padding:'20px 24px',borderBottom:'1px solid #e2e8f0',display:'flex',justifyContent:'space-between',alignItems:'center',background:'#f8fafc',borderRadius:'12px 12px 0 0'}},
+          React.createElement('h3', {style:{margin:0,fontSize:'18px',fontWeight:'700',color:'#1e293b'}}, viewingNote.type),
+          React.createElement('div', {style:{display:'flex',gap:'8px'}},
+            React.createElement('button', {onClick:()=>{var w=window.open('','_blank');w.document.write('<pre style="font-family:Consolas,monospace;padding:40px;max-width:800px;margin:auto;line-height:1.6">'+generateNoteContent(viewingNote,patient)+'</pre>');w.document.title=viewingNote.type;}, style:{padding:'6px 14px',fontSize:'12px',border:'none',borderRadius:'6px',background:'#3b82f6',color:'#fff',cursor:'pointer',fontWeight:'500'}}, 'Print'),
+            React.createElement('button', {onClick:()=>setViewingNote(null), style:{padding:'6px 14px',fontSize:'12px',border:'none',borderRadius:'6px',background:'#ef4444',color:'#fff',cursor:'pointer',fontWeight:'500'}}, 'Close'))),
+        React.createElement('div', {style:{padding:'20px 24px',borderBottom:'1px solid #e2e8f0'}},
+          React.createElement('p', {style:{margin:'4px 0',fontSize:'13px',color:'#64748b'}}, viewingNote.date+' | '+viewingNote.author+' | '+viewingNote.status)),
+        React.createElement('div', {style:{padding:'24px',overflowY:'auto',flex:1}},
+          React.createElement('pre', {style:{fontFamily:'Consolas,Monaco,monospace',fontSize:'13px',lineHeight:'1.7',whiteSpace:'pre-wrap',wordWrap:'break-word',color:'#1e293b',margin:0,background:'#fafafa',padding:'20px',borderRadius:'8px',border:'1px solid #e2e8f0'}}, generateNoteContent(viewingNote,patient))))));}
 
 // ==================== RENDER ====================
 ReactDOM.render(<App/>, document.getElementById('root'));
