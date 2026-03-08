@@ -205,7 +205,7 @@ function App() {
           {currentPage==='schedule' && <Schedule patients={patients} setSelectedPatient={setSelectedPatient} setCurrentPage={setCurrentPage}/>}
           {currentPage==='patients' && <PatientCensus patients={patients} setPatients={setPatients} setSelectedPatient={setSelectedPatient} setCurrentPage={setCurrentPage} onNewAdmission={()=>setShowNewAdmission(true)}/>}
           {currentPage==='unitBoard' && <UnitBoard patients={patients} setSelectedPatient={setSelectedPatient} setCurrentPage={setCurrentPage}/>}
-          {currentPage==='chart' && selectedPatient && <PatientChart patient={selectedPatient} user={user} setCurrentPage={setCurrentPage} patients={patients} setPatients={setPatients}/>}
+          {currentPage==='chart' && selectedPatient && <PatientChart patient={selectedPatient} user={user} setCurrentPage={setCurrentPage} patients={patients} setPatients={setPatients} setSelectedPatient={setSelectedPatient}/>}
         </div>
       </div>
       {showNewAdmission && <NewAdmissionModal onClose={()=>setShowNewAdmission(false)} onSave={(form)=>{
@@ -601,7 +601,7 @@ function UnitBoard({ patients, setSelectedPatient, setCurrentPage }) {
 }
 
 // ==================== PATIENT CHART ====================
-function PatientChart({ patient, user, setCurrentPage , patients, setPatients }) {
+function PatientChart({ patient, user, setCurrentPage , patients, setPatients, setSelectedPatient }) {
   const [chartTab, setChartTab] = useState('overview');
 
   const handleSignNote = (noteEntry) => {
@@ -610,6 +610,7 @@ function PatientChart({ patient, user, setCurrentPage , patients, setPatients })
         ? {...p, noteHistory: [...(p.noteHistory||[]), noteEntry]}
         : p);
       setPatients(updated);
+      if (setSelectedPatient) { var updatedPatient = updated.find(function(p) { return p.id === patient.id; }); if (updatedPatient) setSelectedPatient(updatedPatient); }
     }
   };
   const chartTabs = [
