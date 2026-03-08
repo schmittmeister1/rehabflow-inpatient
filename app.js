@@ -660,7 +660,7 @@ function PatientChart({ patient, user, setCurrentPage , patients, setPatients })
           {label:'SpO2',value:`${patient.vitals.spo2}%`,color:patient.vitals.spo2<92?'var(--danger)':'var(--success)'},
           {label:'RR',value:patient.vitals.rr,color:patient.vitals.rr>24?'var(--danger)':'var(--success)'},
           {label:'Temp',value:`${patient.vitals.temp}\u00B0F`,color:parseFloat(patient.vitals.temp)>100.4?'var(--danger)':'var(--success)'},
-          {label:'O2 Device',value:patient.vitals.o2_device==='Room Air'?'RA':patient.vitals.o2_device.replace('Nasal Cannula','NC'),color:'var(--text-muted)'},
+          {label:'O2 Device',value:(patient.vitals.o2_device||'Room Air')==='Room Air'?'RA':(patient.vitals.o2_device||'').replace('Nasal Cannula','NC'),color:'var(--text-muted)'},
         ].map((s,i)=>(
           <div key={i} style={{background:'#fff',border:'1px solid var(--border)',borderRadius:6,padding:'6px 8px',textAlign:'center'}}>
             <div style={{fontSize:9,color:'var(--text-muted)',textTransform:'uppercase'}}>{s.label}</div>
