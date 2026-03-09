@@ -1,7 +1,3 @@
-
-      </>}
-      {scheduleView==='weekly' && <WeeklyScheduleView patients={patients} selectedDate={selectedDate} setSelectedDate={setSelectedDate} setSelectedPatient={setSelectedPatient} setCurrentPage={setCurrentPage} setNavigationSource={setNavigationSource} customAppointments={customAppointments||[]}/>}
-      {showAddAppt && <AddAppointmentModal patients={patients} selectedDate={selectedDate} customAppointments={customAppointments} setCustomAppointments={setCustomAppointments} onClose={()=>setShowAddAppt(false)}/>}
 const { useState, useEffect, useCallback, useMemo } = React;
 
 // Data loaded from patients-data.js
@@ -424,7 +420,7 @@ function Schedule({ patients, setSelectedPatient, setCurrentPage, setNavigationS
           <button className='btn btn-success btn-sm' onClick={()=>setShowAddAppt(true)}>+ Add Appointment</button>
         </div>
       </div>
-            {scheduleView==='daily' && <>
+            {scheduleView==='daily' && <div>
       {isWeekend ? (
         <div className="card"><div className="card-body" style={{textAlign:'center',padding:40,color:'var(--text-muted)'}}><h3>Weekend  --  Reduced Schedule</h3><p>Only essential/on-call patients scheduled.</p></div></div>
       ) : (
@@ -465,6 +461,9 @@ function Schedule({ patients, setSelectedPatient, setCurrentPage, setNavigationS
         </div>
       </div>
       )}
+      </div>}
+      {scheduleView==='weekly' && <WeeklyScheduleView patients={patients} selectedDate={selectedDate} setSelectedDate={setSelectedDate} setSelectedPatient={setSelectedPatient} setCurrentPage={setCurrentPage} setNavigationSource={setNavigationSource} customAppointments={customAppointments||[]}/>}
+      {showAddAppt && <AddAppointmentModal patients={patients} selectedDate={selectedDate} customAppointments={customAppointments} setCustomAppointments={setCustomAppointments} onClose={()=>setShowAddAppt(false)}/>}
     </div>
   );
 }
