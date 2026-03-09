@@ -1,3 +1,7 @@
+
+      </>}
+      {scheduleView==='weekly' && <WeeklyScheduleView patients={patients} selectedDate={selectedDate} setSelectedDate={setSelectedDate} setSelectedPatient={setSelectedPatient} setCurrentPage={setCurrentPage} setNavigationSource={setNavigationSource} customAppointments={customAppointments||[]}/>}
+      {showAddAppt && <AddAppointmentModal patients={patients} selectedDate={selectedDate} customAppointments={customAppointments} setCustomAppointments={setCustomAppointments} onClose={()=>setShowAddAppt(false)}/>}
 const { useState, useEffect, useCallback, useMemo } = React;
 
 // Data loaded from patients-data.js
@@ -160,6 +164,9 @@ function App() {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [patients, setPatients] = useState(SAMPLE_PATIENTS);
   const [showNewAdmission, setShowNewAdmission] = useState(false);
+  const [navigationSource, setNavigationSource] = useState(null);
+  const [customAppointments, setCustomAppointments] = useState([]);
+  const [sentMessages, setSentMessages] = useState([]);
 
   if (!user) return <LoginPage onLogin={setUser}/>;
 
@@ -168,6 +175,8 @@ function App() {
     { id:'schedule', label:'Schedule', icon:'\u{1F4C5}' },
     { id:'patients', label:'Patient Census', icon:'\u{1F465}' },
     { id:'unitBoard', label:'Unit Board', icon:'\u{1F4CB}' },
+  
+    { id:'messages', label:'Messages', icon:'\u{2709}' },
   ];
 
   return (
@@ -202,10 +211,11 @@ function App() {
         </div>
         <div className="content-area">
           {currentPage==='dashboard' && <Dashboard patients={patients} setSelectedPatient={setSelectedPatient} setCurrentPage={setCurrentPage}/>}
-          {currentPage==='schedule' && <Schedule patients={patients} setSelectedPatient={setSelectedPatient} setCurrentPage={setCurrentPage}/>}
-          {currentPage==='patients' && <PatientCensus patients={patients} setPatients={setPatients} setSelectedPatient={setSelectedPatient} setCurrentPage={setCurrentPage} onNewAdmission={()=>setShowNewAdmission(true)}/>}
+          {currentPage==='schedule' && <Schedule patients={patients} setSelectedPatient={setSelectedPatient} setCurrentPage={setCurrentPage} setNavigationSource={setNavigationSource} customAppointments={customAppointments} setCustomAppointments={setCustomAppointments}/>}
+          {currentPage==='patients' && <PatientCensus patients={patients} setPatients={setPatients} setSelectedPatient={setSelectedPatient} setCurrentPage={setCurrentPage} onNewAdmission={()=>setShowNewAdmission(true)} setNavigationSource={setNavigationSource}/>}
           {currentPage==='unitBoard' && <UnitBoard patients={patients} setSelectedPatient={setSelectedPatient} setCurrentPage={setCurrentPage}/>}
-          {currentPage==='chart' && selectedPatient && <PatientChart patient={selectedPatient} user={user} setCurrentPage={setCurrentPage} patients={patients} setPatients={setPatients} setSelectedPatient={setSelectedPatient}/>}
+          {currentPage==='messages' && <MessagesPage patients={patients} sentMessages={sentMessages} setSentMessages={setSentMessages}/>}
+          {currentPage==='chart' && selectedPatient && <PatientChart patient={selectedPatient} user={user} setCurrentPage={setCurrentPage} patients={patients} setPatients={setPatients} setSelectedPatient={setSelectedPatient} navigationSource={navigationSource} sentMessages={sentMessages} setSentMessages={setSentMessages}/>}
         </div>
       </div>
       {showNewAdmission && <NewAdmissionModal onClose={()=>setShowNewAdmission(false)} onSave={(form)=>{
@@ -341,8 +351,11 @@ function Dashboard({ patients, setSelectedPatient, setCurrentPage }) {
 }
 
 // ==================== SCHEDULE ====================
-function Schedule({ patients, setSelectedPatient, setCurrentPage }) {
+function Schedule({ patients, setSelectedPatient, setCurrentPage, setNavigationSource, customAppointments, setCustomAppointments }) {
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [scheduleView, setScheduleView] = useState('daily');
+  const [showAddAppt, setShowAddAppt] = useState(false);
+  const [newAppt, setNewAppt] = useState({patientId:'',time:'08:00',therapist:'PT',type:'Treatment'});
   const isToday = selectedDate.toDateString() === new Date().toDateString();
   const isWeekend = selectedDate.getDay() === 0 || selectedDate.getDay() === 6;
   const dateStr = selectedDate.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
@@ -379,8 +392,18 @@ function Schedule({ patients, setSelectedPatient, setCurrentPage }) {
         generated.push({time, therapist:'PTA', patientId:null, patient:'', type:'', status:'', room:''});
       }
     });
+    var dateStr = selectedDate.toISOString().split('T')[0];
+    if (customAppointments) {
+      customAppointments.filter(function(a){return a.date===dateStr}).forEach(function(a){
+        var p = patients.find(function(pt){return pt.id===a.patientId});
+        if(p){
+          var tm={'07:00':'7:00 AM','07:30':'7:30 AM','08:00':'8:00 AM','08:30':'8:30 AM','09:00':'9:00 AM','09:30':'9:30 AM','10:00':'10:00 AM','10:30':'10:30 AM','11:00':'11:00 AM','11:30':'11:30 AM','12:00':'12:00 PM','12:30':'12:30 PM','13:00':'1:00 PM','13:30':'1:30 PM','14:00':'2:00 PM','14:30':'2:30 PM','15:00':'3:00 PM','15:30':'3:30 PM','16:00':'4:00 PM'};
+          generated.push({time:tm[a.time]||a.time,patientId:p.id,patientName:p.firstName+' '+p.lastName,therapist:a.therapist,type:a.type,isCustom:true});
+        }
+      });
+    }
     return generated;
-  }, [selectedDate, isToday, patients, isWeekend]);
+  }, [selectedDate, isToday, patients, isWeekend, customAppointments]);
 
   const times = [...new Set(scheduleForDate.map(s=>s.time))];
 
@@ -393,7 +416,15 @@ function Schedule({ patients, setSelectedPatient, setCurrentPage }) {
           <button className="btn btn-outline" onClick={()=>changeDate(1)}>{'\u25B6'}</button>
           {!isToday && <button className="btn btn-sm btn-outline" style={{marginLeft:8}} onClick={()=>setSelectedDate(new Date())}>Today</button>}
         </div>
+        <div style={{display:'flex',gap:8,alignItems:'center'}}>
+          <div style={{display:'flex',border:'1px solid var(--border)',borderRadius:6,overflow:'hidden'}}>
+            <button className={scheduleView==='daily'?'btn btn-primary btn-sm':'btn btn-outline btn-sm'} style={{borderRadius:0}} onClick={()=>setScheduleView('daily')}>Daily</button>
+            <button className={scheduleView==='weekly'?'btn btn-primary btn-sm':'btn btn-outline btn-sm'} style={{borderRadius:0}} onClick={()=>setScheduleView('weekly')}>Weekly</button>
+          </div>
+          <button className='btn btn-success btn-sm' onClick={()=>setShowAddAppt(true)}>+ Add Appointment</button>
+        </div>
       </div>
+            {scheduleView==='daily' && <>
       {isWeekend ? (
         <div className="card"><div className="card-body" style={{textAlign:'center',padding:40,color:'var(--text-muted)'}}><h3>Weekend  --  Reduced Schedule</h3><p>Only essential/on-call patients scheduled.</p></div></div>
       ) : (
@@ -411,7 +442,7 @@ function Schedule({ patients, setSelectedPatient, setCurrentPage }) {
                     <td>{ptAppt && ptAppt.patientId ? (
                       <div className={`schedule-appt ${ptAppt.type==='Initial Eval'?'eval':ptAppt.type==='Discharge Eval'?'discharge':'followup'}`} onClick={()=>{
                         const p = patients.find(p=>p.id===ptAppt.patientId);
-                        if(p){setSelectedPatient(p);setCurrentPage('chart');}
+                        if(p){setSelectedPatient(p);if(setNavigationSource)setNavigationSource('schedule');setCurrentPage('chart');}
                       }}>
                         <div className="appt-name">{ptAppt.patient}</div>
                         <div className="appt-type">{ptAppt.type} {'\u2022'} {ptAppt.room} {'\u2022'} {ptAppt.status}</div>
@@ -420,7 +451,7 @@ function Schedule({ patients, setSelectedPatient, setCurrentPage }) {
                     <td>{ptaAppt && ptaAppt.patientId ? (
                       <div className="schedule-appt followup" onClick={()=>{
                         const p = patients.find(p=>p.id===ptaAppt.patientId);
-                        if(p){setSelectedPatient(p);setCurrentPage('chart');}
+                        if(p){setSelectedPatient(p);if(setNavigationSource)setNavigationSource('schedule');setCurrentPage('chart');}
                       }}>
                         <div className="appt-name">{ptaAppt.patient}</div>
                         <div className="appt-type">{ptaAppt.type} {'\u2022'} {ptaAppt.room} {'\u2022'} {ptaAppt.status}</div>
@@ -439,7 +470,7 @@ function Schedule({ patients, setSelectedPatient, setCurrentPage }) {
 }
 
 // ==================== PATIENT CENSUS ====================
-function PatientCensus({ patients, setPatients, setSelectedPatient, setCurrentPage , onNewAdmission }) {
+function PatientCensus({ patients, setPatients, setSelectedPatient, setCurrentPage, onNewAdmission, setNavigationSource }) {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('Active');
   const [categoryFilter, setCategoryFilter] = useState('All');
@@ -523,7 +554,7 @@ function PatientCensus({ patients, setPatients, setSelectedPatient, setCurrentPa
             </tr></thead>
             <tbody>
               {paged.map(p => (
-                <tr key={p.id} onClick={()=>{setSelectedPatient(p);setCurrentPage('chart');}}>
+                <tr key={p.id} onClick={()=>{setSelectedPatient(p);if(setNavigationSource)setNavigationSource('patients');setCurrentPage('chart');}}>
                   <td style={{fontWeight:600}}>{p.lastName}, {p.firstName}</td>
                   <td style={{fontSize:11,fontFamily:'monospace'}}>{p.mrn}</td>
                   <td style={{fontWeight:600}}>{p.roomNum}</td>
@@ -570,7 +601,7 @@ function UnitBoard({ patients, setSelectedPatient, setCurrentPage }) {
       </div>
       <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(320px,1fr))',gap:12}}>
         {active.map(p => (
-          <div key={p.id} className="card" style={{cursor:'pointer',marginBottom:0}} onClick={()=>{setSelectedPatient(p);setCurrentPage('chart');}}>
+          <div key={p.id} className="card" style={{cursor:'pointer',marginBottom:0}} onClick={()=>{setSelectedPatient(p);if(setNavigationSource)setNavigationSource('patients');setCurrentPage('chart');}}>
             <div className="card-header" style={{padding:'8px 12px'}}>
               <div>
                 <span style={{fontWeight:700}}>{p.lastName}, {p.firstName}</span>
@@ -601,7 +632,7 @@ function UnitBoard({ patients, setSelectedPatient, setCurrentPage }) {
 }
 
 // ==================== PATIENT CHART ====================
-function PatientChart({ patient, user, setCurrentPage , patients, setPatients, setSelectedPatient }) {
+function PatientChart({ patient, user, setCurrentPage, patients, setPatients, setSelectedPatient, navigationSource, sentMessages, setSentMessages }) {
   const [chartTab, setChartTab] = useState('overview');
 
   const handleSignNote = (noteEntry) => {
@@ -613,6 +644,23 @@ function PatientChart({ patient, user, setCurrentPage , patients, setPatients, s
       if (setSelectedPatient) { var updatedPatient = updated.find(function(p) { return p.id === patient.id; }); if (updatedPatient) setSelectedPatient(updatedPatient); }
     }
   };
+  
+  const handleSaveDraft = (noteEntry) => {
+    if (patients && setPatients) {
+      const updated = patients.map(p => {
+        if (p.id === patient.id) {
+          var eh = p.noteHistory || [];
+          var ei = eh.findIndex(n => n.type === noteEntry.type && n.date === noteEntry.date && n.status === 'Draft');
+          if (ei >= 0) { var nh = [...eh]; nh[ei] = noteEntry; return {...p, noteHistory: nh}; }
+          return {...p, noteHistory: [...eh, noteEntry]};
+        }
+        return p;
+      });
+      setPatients(updated);
+      if (setSelectedPatient) { var up = updated.find(function(p) { return p.id === patient.id; }); if (up) setSelectedPatient(up); }
+    }
+  };
+
   const chartTabs = [
     { id:'overview', label:'Overview' },
     { id:'vitals', label:'Vitals/Lines' },
@@ -622,13 +670,14 @@ function PatientChart({ patient, user, setCurrentPage , patients, setPatients, s
     { id:'dailyNote', label:'Treatment Note' },
     { id:'progressNote', label:'Progress Note' },
     { id:'documents', label:'Documents' },
+    { id:'sendMessage', label:'Send Message' },
   ];
 
   return (
     <div className="fade-in">
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
         <div style={{display:'flex',alignItems:'center',gap:8,flexWrap:'wrap'}}>
-          <button className="btn btn-outline" onClick={()=>setCurrentPage('patients')}>{'\u2190'} Back</button>
+          <button className="btn btn-outline" onClick={()=>setCurrentPage(navigationSource||'patients')}>{'\u2190'} {navigationSource==='schedule'?'Back to Schedule':'Back to Patient List'}</button>
           <h2 style={{fontSize:20}}>{patient.lastName}, {patient.firstName}</h2>
           <span className={`badge ${patient.status==='Active'?'badge-green':patient.status==='ICU'?'badge-red':'badge-gray'}`}>{patient.status}</span>
           <span className="badge badge-blue">{patient.careStage}</span>
@@ -682,9 +731,10 @@ function PatientChart({ patient, user, setCurrentPage , patients, setPatients, s
           {chartTab==='sectionGG' && <SectionGGTab patient={patient}/>}
           {chartTab==='assistLevels' && <AssistLevelsTab patient={patient}/>}
           {chartTab==='evalNote' && <InitialEvalNote patient={patient} user={user} onSignNote={handleSignNote}/>}
-          {chartTab==='dailyNote' && <DailyTreatmentNote patient={patient} user={user} onSignNote={handleSignNote}/>}
-          {chartTab==='progressNote' && <ProgressNote patient={patient} user={user} onSignNote={handleSignNote}/>}
+          {chartTab==='dailyNote' && <DailyTreatmentNote patient={patient} user={user} onSignNote={handleSignNote} onSaveDraft={handleSaveDraft}/>}
+          {chartTab==='progressNote' && <ProgressNote patient={patient} user={user} onSignNote={handleSignNote} onSaveDraft={handleSaveDraft}/>}
           {chartTab==='documents' && <DocumentsTab patient={patient}/>}
+          {chartTab==='sendMessage' && <SendMessageFromChart patient={patient} patients={patients} sentMessages={sentMessages} setSentMessages={setSentMessages} setPatients={setPatients} setSelectedPatient={setSelectedPatient}/>}
         </div>
       </div>
     </div>
@@ -1291,7 +1341,7 @@ function InitialEvalNote({ patient, user , onSignNote }) {
 }
 
 // ==================== DAILY TREATMENT NOTE ====================
-function DailyTreatmentNote({ patient, user , onSignNote }) {
+function DailyTreatmentNote({ patient, user, onSignNote, onSaveDraft }) {
   const [noteStatus, setNoteStatus] = useState('draft');
   const [signedBy, setSignedBy] = useState(null);
 
@@ -1420,6 +1470,7 @@ function DailyTreatmentNote({ patient, user , onSignNote }) {
       <div className="card"><div className="card-header">Signature</div><div className="card-body">
         {noteStatus==='draft' ? (
           <div className="signature-area">
+            <button className="btn btn-warning" style={{marginRight:10}} onClick={()=>{if(onSaveDraft)onSaveDraft({type:'Treatment Note',date:new Date().toISOString().split('T')[0],author:user.displayName,status:'Draft'});alert('Draft saved to Documents');}}>Save Draft</button>
             <p>Click "Sign Note" to electronically sign</p>
             <button className="btn btn-success btn-lg" onClick={()=>{setNoteStatus('signed');setSignedBy({name:user.displayName,date:new Date().toLocaleString()});;if(onSignNote){onSignNote({type:'Treatment Note',date:new Date().toISOString().split('T')[0],author:user.displayName,status:'Signed & Locked'})}}}>Sign Note</button>
           </div>
@@ -1435,7 +1486,7 @@ function DailyTreatmentNote({ patient, user , onSignNote }) {
 }
 
 // ==================== PROGRESS NOTE ====================
-function ProgressNote({ patient, user , onSignNote }) {
+function ProgressNote({ patient, user, onSignNote, onSaveDraft }) {
   const [noteStatus, setNoteStatus] = useState('draft');
   const [signedBy, setSignedBy] = useState(null);
   const cd = useMemo(() => generateClinicalData(patient), [patient.id]);
@@ -1502,6 +1553,7 @@ function ProgressNote({ patient, user , onSignNote }) {
       <div className="card"><div className="card-header">Signature</div><div className="card-body">
         {noteStatus==='draft' ? (
           <div className="signature-area">
+            <button className="btn btn-warning" style={{marginRight:10}} onClick={()=>{if(onSaveDraft)onSaveDraft({type:'Progress Note',date:new Date().toISOString().split('T')[0],author:user.displayName,status:'Draft'});alert('Draft saved to Documents');}}>Save Draft</button>
             <p>Click "Sign Note" to electronically sign</p>
             <button className="btn btn-success btn-lg" onClick={()=>{setNoteStatus('signed');setSignedBy({name:user.displayName,date:new Date().toLocaleString()});;if(onSignNote){onSignNote({type:'Progress Note',date:new Date().toISOString().split('T')[0],author:user.displayName,status:'Signed & Locked'})}}}>Sign Note</button>
           </div>
@@ -2000,8 +2052,8 @@ function DocumentsTab({ patient }) {
                 React.createElement('td', {style:{padding:'10px 12px',color:'#64748b'}}, n.author),
                 React.createElement('td', {style:{padding:'10px 12px'}},
                   React.createElement('span', {style:{padding:'2px 8px',borderRadius:'12px',fontSize:'11px',fontWeight:'500',
-                    background: n.status==='Signed'?'#dcfce7':n.status==='Co-Signed'?'#dbeafe':'#fef9c3',
-                    color: n.status==='Signed'?'#166534':n.status==='Co-Signed'?'#1e40af':'#854d0e'}}, n.status)),
+                    background: n.status==='Signed'||n.status==='Signed & Locked'?'#dcfce7':n.status==='Co-Signed'?'#dbeafe':n.status==='Draft'?'#fef9c3':n.status==='Sent'?'#e0e7ff':'#fef9c3',
+                    color: n.status==='Signed'||n.status==='Signed & Locked'?'#166534':n.status==='Co-Signed'?'#1e40af':n.status==='Draft'?'#854d0e':n.status==='Sent'?'#3730a3':'#854d0e'}}, n.status)),
                 React.createElement('td', {style:{padding:'10px 12px'}},
                   React.createElement('button', {onClick:()=>setViewingNote(n), style:{padding:'4px 12px',fontSize:'12px',border:'1px solid #3b82f6',borderRadius:'6px',background:'#fff',color:'#3b82f6',cursor:'pointer',fontWeight:'500'}}, 'View')))))),
     viewingNote && React.createElement('div', {style:{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:10000,display:'flex',alignItems:'center',justifyContent:'center',padding:'20px'}, onClick:()=>setViewingNote(null)},
@@ -2017,4 +2069,113 @@ function DocumentsTab({ patient }) {
           React.createElement('pre', {style:{fontFamily:'Consolas,Monaco,monospace',fontSize:'13px',lineHeight:'1.7',whiteSpace:'pre-wrap',wordWrap:'break-word',color:'#1e293b',margin:0,background:'#fafafa',padding:'20px',borderRadius:'8px',border:'1px solid #e2e8f0'}}, generateNoteContent(viewingNote,patient))))));}
 
 // ==================== RENDER ====================
+
+// ____________________ WEEKLY SCHEDULE VIEW ____________________
+function WeeklyScheduleView({ patients, selectedDate, setSelectedDate, setSelectedPatient, setCurrentPage, setNavigationSource, customAppointments }) {
+  var getMonday = function(d) { var day = d.getDay(); var diff = d.getDate() - day + (day === 0 ? -6 : 1); return new Date(d.getFullYear(), d.getMonth(), diff); };
+  var monday = getMonday(new Date(selectedDate));
+  var weekDays = []; for (var i = 0; i < 5; i++) { var d = new Date(monday); d.setDate(monday.getDate() + i); weekDays.push(d); }
+  var hours = []; for (var h = 7; h <= 16; h++) { for (var m = 0; m < 60; m += 30) { hours.push({h:h,m:m,label:(h>12?h-12:h)+':'+(m===0?'00':'30')+(h>=12?' PM':' AM')}); } }
+  var getAppts = function(date) {
+    var dateStr = date.toISOString().split('T')[0]; var seed = date.getFullYear()*10000+date.getMonth()*100+date.getDate(); var appts = [];
+    var types = ['Treatment','Treatment','Treatment','Initial Eval','Re-eval','Discharge'];
+    patients.forEach(function(p, pi) { var hash = (seed*(pi+1)*7+pi*13)%100; if(hash<65){ var si=(seed+pi*3)%hours.length; appts.push({patient:p,time:hours[Math.min(si,hours.length-1)],type:types[(seed+pi)%types.length],therapist:(pi%3===0)?'PTA':'PT'}); } });
+    if(customAppointments){customAppointments.filter(function(a){return a.date===dateStr}).forEach(function(a){var p=patients.find(function(pt){return pt.id===a.patientId});if(p){var parts=a.time.split(':');appts.push({patient:p,time:{h:parseInt(parts[0]),m:parseInt(parts[1]),label:''},type:a.type,therapist:a.therapist,isCustom:true});}});}
+    return appts;
+  };
+  var colorMap = {'Initial Eval':'#dbeafe','Treatment':'#dcfce7','Re-eval':'#fef9c3','Discharge':'#fed7aa'};
+  var prevWeek = function(){ var d=new Date(monday);d.setDate(d.getDate()-7);setSelectedDate(d); };
+  var nextWeek = function(){ var d=new Date(monday);d.setDate(d.getDate()+7);setSelectedDate(d); };
+  return React.createElement('div',{className:'card'},
+    React.createElement('div',{className:'card-header',style:{display:'flex',justifyContent:'space-between',alignItems:'center'}},
+      React.createElement('button',{className:'btn btn-outline btn-sm',onClick:prevWeek},'\u25C0 Prev Week'),
+      React.createElement('h4',null,'Week of '+monday.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})),
+      React.createElement('button',{className:'btn btn-outline btn-sm',onClick:nextWeek},'Next Week \u25B6')
+    ),
+    React.createElement('div',{className:'card-body',style:{overflowX:'auto'}},
+      React.createElement('table',{style:{width:'100%',borderCollapse:'collapse',fontSize:12}},
+        React.createElement('thead',null,React.createElement('tr',null,
+          React.createElement('th',{style:{width:60,padding:4,borderBottom:'2px solid var(--border)'}},'Time'),
+          weekDays.map(function(d,i){return React.createElement('th',{key:i,style:{padding:4,borderBottom:'2px solid var(--border)',textAlign:'center',minWidth:140,background:d.toDateString()===new Date().toDateString()?'#dbeafe':'transparent'}},['Mon','Tue','Wed','Thu','Fri'][i]+' '+(d.getMonth()+1)+'/'+d.getDate())}))),
+        React.createElement('tbody',null,hours.map(function(slot,si){return React.createElement('tr',{key:si,style:{borderBottom:'1px solid var(--border)'}},
+          React.createElement('td',{style:{padding:2,fontSize:11,color:'var(--text-muted)',whiteSpace:'nowrap'}},slot.label),
+          weekDays.map(function(day,di){var da=getAppts(day).filter(function(a){return a.time.h===slot.h&&a.time.m===slot.m});return React.createElement('td',{key:di,style:{padding:2,verticalAlign:'top',borderLeft:'1px solid var(--border)'}},
+            da.map(function(a,ai){return React.createElement('div',{key:ai,onClick:function(){setSelectedPatient(a.patient);if(setNavigationSource)setNavigationSource('schedule');setCurrentPage('chart');},style:{padding:'2px 4px',marginBottom:1,borderRadius:3,background:colorMap[a.type]||'#f3f4f6',cursor:'pointer',fontSize:11,border:a.isCustom?'2px solid #6366f1':'none'},title:a.patient.firstName+' '+a.patient.lastName},a.patient.lastName+', '+a.patient.firstName.charAt(0)+' ('+a.therapist+')')}))
+          ;}))})))
+  );
+}
+
+
+// ____________________ ADD APPOINTMENT MODAL ____________________
+function AddAppointmentModal({ patients, selectedDate, customAppointments, setCustomAppointments, onClose }) {
+  var _ad = useState({patientId:patients.length>0?patients[0].id:'',date:selectedDate.toISOString().split('T')[0],time:'09:00',therapist:'PT',type:'Treatment'});
+  var apptData=_ad[0],setApptData=_ad[1];
+  var timeSlots=[]; for(var h=7;h<=16;h++){for(var m=0;m<60;m+=30){var ts=(h<10?'0':'')+h+':'+(m===0?'00':'30');timeSlots.push(ts);}}
+  var handleSave=function(){if(!apptData.patientId){alert('Please select a patient');return;}setCustomAppointments([].concat(customAppointments||[],[Object.assign({},apptData)]));onClose();};
+  return React.createElement('div',{style:{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center'}},
+    React.createElement('div',{className:'card',style:{width:420,maxHeight:'90vh',overflow:'auto'}},
+      React.createElement('div',{className:'card-header',style:{display:'flex',justifyContent:'space-between',alignItems:'center'}},React.createElement('h4',null,'Add Appointment'),React.createElement('button',{className:'btn btn-outline btn-sm',onClick:onClose},'X')),
+      React.createElement('div',{className:'card-body'},
+        React.createElement('div',{style:{marginBottom:12}},React.createElement('label',{style:{fontWeight:600,display:'block',marginBottom:4}},'Patient'),React.createElement('select',{className:'form-control',value:apptData.patientId,onChange:function(e){setApptData(Object.assign({},apptData,{patientId:e.target.value}))}},patients.map(function(p){return React.createElement('option',{key:p.id,value:p.id},p.lastName+', '+p.firstName)}))),
+        React.createElement('div',{style:{marginBottom:12}},React.createElement('label',{style:{fontWeight:600,display:'block',marginBottom:4}},'Date'),React.createElement('input',{type:'date',className:'form-control',value:apptData.date,onChange:function(e){setApptData(Object.assign({},apptData,{date:e.target.value}))}})),
+        React.createElement('div',{style:{marginBottom:12}},React.createElement('label',{style:{fontWeight:600,display:'block',marginBottom:4}},'Time'),React.createElement('select',{className:'form-control',value:apptData.time,onChange:function(e){setApptData(Object.assign({},apptData,{time:e.target.value}))}},timeSlots.map(function(ts){return React.createElement('option',{key:ts,value:ts},(parseInt(ts)>12?(parseInt(ts)-12):parseInt(ts))+':'+ts.split(':')[1]+' '+(parseInt(ts)>=12?'PM':'AM'))}))),
+        React.createElement('div',{style:{marginBottom:12}},React.createElement('label',{style:{fontWeight:600,display:'block',marginBottom:4}},'Therapist'),React.createElement('select',{className:'form-control',value:apptData.therapist,onChange:function(e){setApptData(Object.assign({},apptData,{therapist:e.target.value}))}},React.createElement('option',{value:'PT'},'PT'),React.createElement('option',{value:'PTA'},'PTA'))),
+        React.createElement('div',{style:{marginBottom:12}},React.createElement('label',{style:{fontWeight:600,display:'block',marginBottom:4}},'Type'),React.createElement('select',{className:'form-control',value:apptData.type,onChange:function(e){setApptData(Object.assign({},apptData,{type:e.target.value}))}},React.createElement('option',{value:'Treatment'},'Treatment'),React.createElement('option',{value:'Initial Eval'},'Initial Eval'),React.createElement('option',{value:'Re-eval'},'Re-eval'),React.createElement('option',{value:'Discharge'},'Discharge Eval'))),
+        React.createElement('button',{className:'btn btn-success',style:{width:'100%'},onClick:handleSave},'Add to Schedule'))))
+  ;
+}
+
+
+// ____________________ MESSAGES PAGE ____________________
+function MessagesPage({ patients, sentMessages, setSentMessages }) {
+  var _sc=useState(false);var showCompose=_sc[0],setShowCompose=_sc[1];
+  var _md=useState({recipient:'',subject:'',body:'',patientId:''});var msgData=_md[0],setMsgData=_md[1];
+  var _at=useState('inbox');var activeTab=_at[0],setActiveTab=_at[1];
+  var providers=[{name:'Dr. Robert Chen',role:'Orthopedics'},{name:'Dr. Sarah Kim',role:'PCP'},{name:'Dr. Michael Torres',role:'Neurology'},{name:'Dr. Lisa Wang',role:'Internal Medicine'},{name:'Alex Rivera, PTA',role:'Physical Therapy'},{name:'Jamie Foster, OT',role:'Occupational Therapy'},{name:'Morgan Lee, SLP',role:'Speech Therapy'},{name:'Dr. James Wilson',role:'Cardiology'}];
+  var inboxMessages=[
+    {id:1,from:'Dr. Robert Chen',subject:'Post-op protocol update - Thompson',date:'2026-03-09',body:'Please progress weight bearing as tolerated for the right knee.',read:true},
+    {id:2,from:'Dr. Sarah Kim',subject:'Lab results - Martinez',date:'2026-03-08',body:'A1C results came back at 7.2. Monitor for diabetic neuropathy.',read:true},
+    {id:3,from:'Jamie Foster, OT',subject:'Co-treatment request',date:'2026-03-08',body:'Would like to schedule a co-treatment for Mrs. Johnson. Available Thursday AM.',read:false},
+    {id:4,from:'Dr. Michael Torres',subject:'MRI findings - Davis',date:'2026-03-07',body:'MRI shows moderate L4-L5 disc herniation. Conservative PT approach recommended.',read:false},
+    {id:5,from:'Morgan Lee, SLP',subject:'Swallowing precautions - Room 412',date:'2026-03-07',body:'Patient on nectar-thick liquids. Ensure upright positioning.',read:true}
+  ];
+  var handleSend=function(){if(!msgData.recipient||!msgData.subject){alert('Please fill in recipient and subject');return;}var newMsg={id:Date.now(),to:msgData.recipient,subject:msgData.subject,body:msgData.body,date:new Date().toISOString().split('T')[0],patientId:msgData.patientId||null};setSentMessages([].concat(sentMessages||[],[newMsg]));setShowCompose(false);setMsgData({recipient:'',subject:'',body:'',patientId:''});alert('Message sent');};
+  return React.createElement('div',{className:'fade-in'},
+    React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}},React.createElement('h3',null,'Messages'),React.createElement('button',{className:'btn btn-success',onClick:function(){setShowCompose(true)}},'Compose Message')),
+    React.createElement('div',{style:{display:'flex',gap:8,marginBottom:16}},React.createElement('button',{className:activeTab==='inbox'?'btn btn-primary':'btn btn-outline',onClick:function(){setActiveTab('inbox')}},'Inbox ('+inboxMessages.length+')'),React.createElement('button',{className:activeTab==='sent'?'btn btn-primary':'btn btn-outline',onClick:function(){setActiveTab('sent')}},'Sent ('+(sentMessages||[]).length+')')),
+    activeTab==='inbox'&&React.createElement('div',null,inboxMessages.map(function(msg){return React.createElement('div',{key:msg.id,className:'card',style:{marginBottom:8,borderLeft:msg.read?'':'3px solid #3b82f6'}},React.createElement('div',{className:'card-body',style:{padding:12}},React.createElement('div',{style:{display:'flex',justifyContent:'space-between'}},React.createElement('strong',null,msg.from),React.createElement('span',{style:{color:'var(--text-muted)',fontSize:13}},msg.date)),React.createElement('div',{style:{fontWeight:msg.read?'normal':'600',marginTop:4}},msg.subject),React.createElement('div',{style:{color:'var(--text-muted)',fontSize:13,marginTop:4}},msg.body)))})),
+    activeTab==='sent'&&React.createElement('div',null,(sentMessages||[]).length===0?React.createElement('div',{className:'card'},React.createElement('div',{className:'card-body',style:{textAlign:'center',color:'var(--text-muted)'}},'No sent messages yet')):(sentMessages||[]).map(function(msg){return React.createElement('div',{key:msg.id,className:'card',style:{marginBottom:8}},React.createElement('div',{className:'card-body',style:{padding:12}},React.createElement('div',{style:{display:'flex',justifyContent:'space-between'}},React.createElement('strong',null,'To: '+msg.to),React.createElement('span',{style:{color:'var(--text-muted)',fontSize:13}},msg.date)),React.createElement('div',{style:{marginTop:4}},msg.subject),React.createElement('div',{style:{color:'var(--text-muted)',fontSize:13,marginTop:4}},msg.body)))})),
+    showCompose&&React.createElement('div',{style:{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center'}},
+      React.createElement('div',{className:'card',style:{width:500,maxHeight:'90vh',overflow:'auto'}},
+        React.createElement('div',{className:'card-header',style:{display:'flex',justifyContent:'space-between',alignItems:'center'}},React.createElement('h4',null,'Compose Message'),React.createElement('button',{className:'btn btn-outline btn-sm',onClick:function(){setShowCompose(false)}},'X')),
+        React.createElement('div',{className:'card-body'},
+          React.createElement('div',{style:{marginBottom:12}},React.createElement('label',{style:{fontWeight:600,display:'block',marginBottom:4}},'To'),React.createElement('select',{className:'form-control',value:msgData.recipient,onChange:function(e){setMsgData(Object.assign({},msgData,{recipient:e.target.value}))}},React.createElement('option',{value:''},'Select recipient...'),providers.map(function(pr){return React.createElement('option',{key:pr.name,value:pr.name},pr.name+' - '+pr.role)}))),
+          React.createElement('div',{style:{marginBottom:12}},React.createElement('label',{style:{fontWeight:600,display:'block',marginBottom:4}},'Subject'),React.createElement('input',{type:'text',className:'form-control',value:msgData.subject,onChange:function(e){setMsgData(Object.assign({},msgData,{subject:e.target.value}))},placeholder:'Message subject'})),
+          React.createElement('div',{style:{marginBottom:12}},React.createElement('label',{style:{fontWeight:600,display:'block',marginBottom:4}},'Related Patient (optional)'),React.createElement('select',{className:'form-control',value:msgData.patientId,onChange:function(e){setMsgData(Object.assign({},msgData,{patientId:e.target.value}))}},React.createElement('option',{value:''},'None'),patients.map(function(p){return React.createElement('option',{key:p.id,value:p.id},p.lastName+', '+p.firstName)}))),
+          React.createElement('div',{style:{marginBottom:12}},React.createElement('label',{style:{fontWeight:600,display:'block',marginBottom:4}},'Message'),React.createElement('textarea',{className:'form-control',rows:5,value:msgData.body,onChange:function(e){setMsgData(Object.assign({},msgData,{body:e.target.value}))},placeholder:'Type your message...'})),
+          React.createElement('button',{className:'btn btn-success',style:{width:'100%'},onClick:handleSend},'Send Message')))))
+  ;
+}
+
+
+// ____________________ SEND MESSAGE FROM CHART ____________________
+function SendMessageFromChart(props) {
+  var patient=props.patient,patients=props.patients,sentMessages=props.sentMessages,setSentMessages=props.setSentMessages,setPatients=props.setPatients,setSelectedPatient=props.setSelectedPatient;
+  var _ms=useState({recipient:'',subject:'Re: '+patient.lastName+', '+patient.firstName,body:''});var msgData=_ms[0],setMsgData=_ms[1];
+  var providers=[{name:'Dr. Robert Chen',role:'Orthopedics'},{name:'Dr. Sarah Kim',role:'PCP'},{name:'Dr. Michael Torres',role:'Neurology'},{name:'Dr. Lisa Wang',role:'Internal Medicine'},{name:'Alex Rivera, PTA',role:'Physical Therapy'},{name:'Jamie Foster, OT',role:'Occupational Therapy'},{name:'Morgan Lee, SLP',role:'Speech Therapy'},{name:'Dr. James Wilson',role:'Cardiology'}];
+  var handleSend=function(){if(!msgData.recipient||!msgData.subject){alert('Please fill in recipient and subject');return;}
+    var newMsg={id:Date.now(),to:msgData.recipient,subject:msgData.subject,body:msgData.body,date:new Date().toISOString().split('T')[0],patientId:patient.id};
+    setSentMessages([].concat(sentMessages||[],[newMsg]));
+    if(patients&&setPatients){var ne={type:'Message',date:new Date().toISOString().split('T')[0],author:'Current User',status:'Sent',subject:msgData.subject,recipient:msgData.recipient};var updated=patients.map(function(p){return p.id===patient.id?Object.assign({},p,{noteHistory:[].concat(p.noteHistory||[],[ne])}):p;});setPatients(updated);if(setSelectedPatient){var up=updated.find(function(p){return p.id===patient.id});if(up)setSelectedPatient(up);}}
+    alert('Message sent and saved to Documents');setMsgData({recipient:'',subject:'Re: '+patient.lastName+', '+patient.firstName,body:''});};
+  return React.createElement('div',{className:'card'},
+    React.createElement('div',{className:'card-header'},React.createElement('h4',null,'Send Message About '+patient.firstName+' '+patient.lastName)),
+    React.createElement('div',{className:'card-body'},
+      React.createElement('div',{style:{marginBottom:12}},React.createElement('label',{style:{fontWeight:600,display:'block',marginBottom:4}},'To'),React.createElement('select',{className:'form-control',value:msgData.recipient,onChange:function(e){setMsgData(Object.assign({},msgData,{recipient:e.target.value}))}},React.createElement('option',{value:''},'Select recipient...'),providers.map(function(pr){return React.createElement('option',{key:pr.name,value:pr.name},pr.name+' - '+pr.role)}))),
+      React.createElement('div',{style:{marginBottom:12}},React.createElement('label',{style:{fontWeight:600,display:'block',marginBottom:4}},'Subject'),React.createElement('input',{type:'text',className:'form-control',value:msgData.subject,onChange:function(e){setMsgData(Object.assign({},msgData,{subject:e.target.value}))}})),
+      React.createElement('div',{style:{marginBottom:12}},React.createElement('label',{style:{fontWeight:600,display:'block',marginBottom:4}},'Message'),React.createElement('textarea',{className:'form-control',rows:5,value:msgData.body,onChange:function(e){setMsgData(Object.assign({},msgData,{body:e.target.value}))},placeholder:'Type your message...'})),
+      React.createElement('button',{className:'btn btn-success',onClick:handleSend},'Send Message')))
+  ;
+}
+
 ReactDOM.render(<App/>, document.getElementById('root'));
