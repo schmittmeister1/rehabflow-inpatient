@@ -2100,7 +2100,7 @@ function WeeklyScheduleView({ patients, selectedDate, setSelectedDate, setSelect
           React.createElement('td',{style:{padding:2,fontSize:11,color:'var(--text-muted)',whiteSpace:'nowrap'}},slot.label),
           weekDays.map(function(day,di){var da=getAppts(day).filter(function(a){return a.time.h===slot.h&&a.time.m===slot.m});return React.createElement('td',{key:di,style:{padding:2,verticalAlign:'top',borderLeft:'1px solid var(--border)'}},
             da.map(function(a,ai){return React.createElement('div',{key:ai,onClick:function(){setSelectedPatient(a.patient);if(setNavigationSource)setNavigationSource('schedule');setCurrentPage('chart');},style:{padding:'2px 4px',marginBottom:1,borderRadius:3,background:colorMap[a.type]||'#f3f4f6',cursor:'pointer',fontSize:11,border:a.isCustom?'2px solid #6366f1':'none'},title:a.patient.firstName+' '+a.patient.lastName},a.patient.lastName+', '+a.patient.firstName.charAt(0)+' ('+a.therapist+')')}))
-          ;}))})))
+          ;}))}))))
   );
 }
 
