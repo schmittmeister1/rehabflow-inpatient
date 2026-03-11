@@ -369,7 +369,7 @@ function Schedule({ patients, setSelectedPatient, setCurrentPage, setNavigationS
         const dateKey = selectedDate.toISOString().split('T')[0];
         customAppointments.forEach(ca => {
           if (ca.date === dateKey) {
-            const pt = patients.find(p => p.id === ca.patientId);
+            const pt = patients.find(p => p.id == ca.patientId);
             if (pt) todayAppts.push({time: ca.time, therapist: ca.therapist, patientId: ca.patientId, patient: pt, type: ca.type, status: 'Scheduled'});
           }
         });
@@ -416,7 +416,7 @@ function Schedule({ patients, setSelectedPatient, setCurrentPage, setNavigationS
       const dateKey = selectedDate.toISOString().split('T')[0];
       customAppointments.forEach(ca => {
         if (ca.date === dateKey) {
-          const pt = patients.find(p => p.id === ca.patientId);
+          const pt = patients.find(p => p.id == ca.patientId);
           if (pt) {
             generated.push({time: ca.time, therapist: ca.therapist, patientId: ca.patientId, patient: pt, type: ca.type, status: 'Scheduled'});
           }
@@ -2147,7 +2147,7 @@ function WeeklyScheduleView({ patients, selectedDate, setSelectedPatient, setCur
     if (customAppointments) {
       customAppointments.forEach(function(ca) {
         if (ca.date === dateStr) {
-          var pt = patients.find(function(p) { return p.id === ca.patientId; });
+          var pt = patients.find(function(p) { return p.id == ca.patientId; });
           if (pt) generated.push({time: ca.time, therapist: ca.therapist, patientId: ca.patientId, patient: pt, type: ca.type, status: 'Scheduled'});
         }
       });
@@ -2159,8 +2159,12 @@ function WeeklyScheduleView({ patients, selectedDate, setSelectedPatient, setCur
   var typeBorders = {'Follow-up':'#3b82f6','Re-eval':'#f59e0b','Treatment':'#22c55e','Discharge':'#ef4444','Initial Eval':'#a855f7'};
   
   var handlePatientClick = function(appt) {
-    if (appt.patient && setSelectedPatient) {
-      setSelectedPatient(appt.patient);
+    if (!setSelectedPatient) return;
+    var pt = null;
+    if (appt.patient && typeof appt.patient === 'object') { pt = appt.patient; }
+    else if (appt.patientId && patients) { pt = patients.find(function(p) { return p.id == appt.patientId; }); }
+    if (pt) {
+      setSelectedPatient(pt);
       if (setNavigationSource) setNavigationSource('schedule');
       setCurrentPage('chart');
     }
@@ -2199,14 +2203,14 @@ function WeeklyScheduleView({ patients, selectedDate, setSelectedPatient, setCur
                   <td style={{padding:'6px 8px',fontWeight:isHourStart?700:400,fontSize:isHourStart?13:11,color:isHourStart?'#1e293b':'#94a3b8',borderBottom:'1px solid '+(isHourStart?'#cbd5e1':'#f1f5f9'),borderRight:'2px solid #e2e8f0',textAlign:'center',whiteSpace:'nowrap'}}>{slot.label}</td>
                   {weekDays.map((dayDate, di) => {
                     var dayAppts = getApptsForDay(dayDate);
-                    var cellAppts = dayAppts.filter(function(a) { return a.time === slot.label; });
+                    var cellAppts = dayAppts.filter(function(a) { return a.time === slot.label && a.patientId; });
                     return (
                       <td key={di} style={{padding:'3px 4px',borderBottom:'1px solid '+(isHourStart?'#cbd5e1':'#f1f5f9'),borderRight:'1px solid #f1f5f9',verticalAlign:'top',minHeight:36}}>
                         {cellAppts.map((appt, ai) => (
                           <div key={ai} onClick={function(){handlePatientClick(appt);}} style={{padding:'4px 6px',marginBottom:2,borderRadius:4,fontSize:11,cursor:'pointer',background:typeColors[appt.type]||'#f1f5f9',borderLeft:'3px solid '+(typeBorders[appt.type]||'#94a3b8'),lineHeight:1.3,transition:'transform 0.1s',overflow:'hidden'}}
                             onMouseOver={function(e){e.currentTarget.style.transform='scale(1.02)';e.currentTarget.style.boxShadow='0 1px 4px rgba(0,0,0,0.15)';}}
                             onMouseOut={function(e){e.currentTarget.style.transform='scale(1)';e.currentTarget.style.boxShadow='none';}}>
-                            <div style={{fontWeight:700,color:'#1e293b',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{appt.patient ? appt.patient.lastName + ', ' + appt.patient.firstName.charAt(0) + '.' : '—'}</div>
+                            <div style={{fontWeight:700,color:'#1e293b',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{appt.patient ? (typeof appt.patient === 'string' ? appt.patient : appt.patient.lastName + ', ' + (appt.patient.firstName || '').charAt(0) + '.') : '—'}</div>
                             <div style={{color:'#64748b',fontSize:10}}>{appt.therapist} • {appt.type}</div>
                           </div>
                         ))}
@@ -2239,7 +2243,7 @@ function AddAppointmentModal({ patients, selectedDate, customAppointments, setCu
     React.createElement('div',{className:'card',style:{width:420,maxHeight:'90vh',overflow:'auto'}},
       React.createElement('div',{className:'card-header',style:{display:'flex',justifyContent:'space-between',alignItems:'center'}},React.createElement('h4',null,'Add Appointment'),React.createElement('button',{className:'btn btn-outline btn-sm',onClick:onClose},'X')),
       React.createElement('div',{className:'card-body'},
-        React.createElement('div',{style:{marginBottom:12}},React.createElement('label',{style:{fontWeight:600,display:'block',marginBottom:4}},'Patient'),React.createElement('select',{className:'form-control',value:apptData.patientId,onChange:function(e){setApptData(Object.assign({},apptData,{patientId:e.target.value}))}},patients.map(function(p){return React.createElement('option',{key:p.id,value:p.id},p.lastName+', '+p.firstName)}))),
+        React.createElement('div',{style:{marginBottom:12}},React.createElement('label',{style:{fontWeight:600,display:'block',marginBottom:4}},'Patient'),React.createElement('select',{className:'form-control',value:apptData.patientId,onChange:function(e){setApptData(Object.assign({},apptData,{patientId:parseInt(e.target.value)||e.target.value}))}},patients.map(function(p){return React.createElement('option',{key:p.id,value:p.id},p.lastName+', '+p.firstName)}))),
         React.createElement('div',{style:{marginBottom:12}},React.createElement('label',{style:{fontWeight:600,display:'block',marginBottom:4}},'Date'),React.createElement('input',{type:'date',className:'form-control',value:apptData.date,onChange:function(e){setApptData(Object.assign({},apptData,{date:e.target.value}))}})),
         React.createElement('div',{style:{marginBottom:12}},React.createElement('label',{style:{fontWeight:600,display:'block',marginBottom:4}},'Time'),React.createElement('select',{className:'form-control',value:apptData.time,onChange:function(e){setApptData(Object.assign({},apptData,{time:e.target.value}))}},timeSlots.map(function(ts){return React.createElement('option',{key:ts,value:ts},(parseInt(ts)>12?(parseInt(ts)-12):parseInt(ts))+':'+ts.split(':')[1]+' '+(parseInt(ts)>=12?'PM':'AM'))}))),
         React.createElement('div',{style:{marginBottom:12}},React.createElement('label',{style:{fontWeight:600,display:'block',marginBottom:4}},'Therapist'),React.createElement('select',{className:'form-control',value:apptData.therapist,onChange:function(e){setApptData(Object.assign({},apptData,{therapist:e.target.value}))}},React.createElement('option',{value:'PT'},'PT'),React.createElement('option',{value:'PTA'},'PTA'))),
