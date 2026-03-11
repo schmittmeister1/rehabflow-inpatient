@@ -363,7 +363,19 @@ function Schedule({ patients, setSelectedPatient, setCurrentPage, setNavigationS
   };
 
   const scheduleForDate = useMemo(() => {
-    if (isToday) return SCHEDULE_DATA;
+    if (isToday) {
+      var todayAppts = [...SCHEDULE_DATA];
+      if (customAppointments && customAppointments.length > 0) {
+        const dateKey = selectedDate.toISOString().split('T')[0];
+        customAppointments.forEach(ca => {
+          if (ca.date === dateKey) {
+            const pt = patients.find(p => p.id === ca.patientId);
+            if (pt) todayAppts.push({time: ca.time, therapist: ca.therapist, patientId: ca.patientId, patient: pt, type: ca.type, status: 'Scheduled'});
+          }
+        });
+      }
+      return todayAppts;
+    }
     const activePatients = patients.filter(p => p.status !== 'Discharged');
     const times = ['7:00 AM','7:30 AM','8:00 AM','8:30 AM','9:00 AM','9:30 AM','10:00 AM','10:30 AM','11:00 AM','11:30 AM','12:00 PM','1:00 PM','1:30 PM','2:00 PM','2:30 PM','3:00 PM','3:30 PM','4:00 PM'];
     const generated = [];
@@ -395,6 +407,19 @@ function Schedule({ patients, setSelectedPatient, setCurrentPage, setNavigationS
         if(p){
           var tm={'07:00':'7:00 AM','07:30':'7:30 AM','08:00':'8:00 AM','08:30':'8:30 AM','09:00':'9:00 AM','09:30':'9:30 AM','10:00':'10:00 AM','10:30':'10:30 AM','11:00':'11:00 AM','11:30':'11:30 AM','12:00':'12:00 PM','12:30':'12:30 PM','13:00':'1:00 PM','13:30':'1:30 PM','14:00':'2:00 PM','14:30':'2:30 PM','15:00':'3:00 PM','15:30':'3:30 PM','16:00':'4:00 PM'};
           generated.push({time:tm[a.time]||a.time,patientId:p.id,patientName:p.firstName+' '+p.lastName,therapist:a.therapist,type:a.type,isCustom:true});
+        }
+      });
+    }
+    
+    // Merge custom appointments for this date
+    if (customAppointments && customAppointments.length > 0) {
+      const dateKey = selectedDate.toISOString().split('T')[0];
+      customAppointments.forEach(ca => {
+        if (ca.date === dateKey) {
+          const pt = patients.find(p => p.id === ca.patientId);
+          if (pt) {
+            generated.push({time: ca.time, therapist: ca.therapist, patientId: ca.patientId, patient: pt, type: ca.type, status: 'Scheduled'});
+          }
         }
       });
     }
@@ -2070,37 +2095,136 @@ function DocumentsTab({ patient }) {
 // ==================== RENDER ====================
 
 // ____________________ WEEKLY SCHEDULE VIEW ____________________
-function WeeklyScheduleView({ patients, selectedDate, setSelectedDate, setSelectedPatient, setCurrentPage, setNavigationSource, customAppointments }) {
-  var getMonday = function(d) { var day = d.getDay(); var diff = d.getDate() - day + (day === 0 ? -6 : 1); return new Date(d.getFullYear(), d.getMonth(), diff); };
-  var monday = getMonday(new Date(selectedDate));
-  var weekDays = []; for (var i = 0; i < 5; i++) { var d = new Date(monday); d.setDate(monday.getDate() + i); weekDays.push(d); }
-  var hours = []; for (var h = 7; h <= 16; h++) { for (var m = 0; m < 60; m += 30) { hours.push({h:h,m:m,label:(h>12?h-12:h)+':'+(m===0?'00':'30')+(h>=12?' PM':' AM')}); } }
-  var getAppts = function(date) {
-    var dateStr = date.toISOString().split('T')[0]; var seed = date.getFullYear()*10000+date.getMonth()*100+date.getDate(); var appts = [];
-    var types = ['Treatment','Treatment','Treatment','Initial Eval','Re-eval','Discharge'];
-    patients.forEach(function(p, pi) { var hash = (seed*(pi+1)*7+pi*13)%100; if(hash<65){ var si=(seed+pi*3)%hours.length; appts.push({patient:p,time:hours[Math.min(si,hours.length-1)],type:types[(seed+pi)%types.length],therapist:(pi%3===0)?'PTA':'PT'}); } });
-    if(customAppointments){customAppointments.filter(function(a){return a.date===dateStr}).forEach(function(a){var p=patients.find(function(pt){return pt.id===a.patientId});if(p){var parts=a.time.split(':');appts.push({patient:p,time:{h:parseInt(parts[0]),m:parseInt(parts[1]),label:''},type:a.type,therapist:a.therapist,isCustom:true});}});}
-    return appts;
+// ========== WeeklyScheduleView Component ==========
+function WeeklyScheduleView({ patients, selectedDate, setSelectedPatient, setCurrentPage, setNavigationSource, customAppointments }) {
+  var _wk = useState(0); var weekOffset = _wk[0], setWeekOffset = _wk[1];
+  
+  var getMonday = function(d, offset) {
+    var dt = new Date(d); dt.setDate(dt.getDate() - ((dt.getDay() + 6) % 7) + (offset * 7)); return dt;
   };
-  var colorMap = {'Initial Eval':'#dbeafe','Treatment':'#dcfce7','Re-eval':'#fef9c3','Discharge':'#fed7aa'};
-  var prevWeek = function(){ var d=new Date(monday);d.setDate(d.getDate()-7);setSelectedDate(d); };
-  var nextWeek = function(){ var d=new Date(monday);d.setDate(d.getDate()+7);setSelectedDate(d); };
-  return React.createElement('div',{className:'card'},
-    React.createElement('div',{className:'card-header',style:{display:'flex',justifyContent:'space-between',alignItems:'center'}},
-      React.createElement('button',{className:'btn btn-outline btn-sm',onClick:prevWeek},'\u25C0 Prev Week'),
-      React.createElement('h4',null,'Week of '+monday.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})),
-      React.createElement('button',{className:'btn btn-outline btn-sm',onClick:nextWeek},'Next Week \u25B6')
-    ),
-    React.createElement('div',{className:'card-body',style:{overflowX:'auto'}},
-      React.createElement('table',{style:{width:'100%',borderCollapse:'collapse',fontSize:12}},
-        React.createElement('thead',null,React.createElement('tr',null,
-          React.createElement('th',{style:{width:60,padding:4,borderBottom:'2px solid var(--border)'}},'Time'),
-          weekDays.map(function(d,i){return React.createElement('th',{key:i,style:{padding:4,borderBottom:'2px solid var(--border)',textAlign:'center',minWidth:140,background:d.toDateString()===new Date().toDateString()?'#dbeafe':'transparent'}},['Mon','Tue','Wed','Thu','Fri'][i]+' '+(d.getMonth()+1)+'/'+d.getDate())}))),
-        React.createElement('tbody',null,hours.map(function(slot,si){return React.createElement('tr',{key:si,style:{borderBottom:'1px solid var(--border)'}},
-          React.createElement('td',{style:{padding:2,fontSize:11,color:'var(--text-muted)',whiteSpace:'nowrap'}},slot.label),
-          weekDays.map(function(day,di){var da=getAppts(day).filter(function(a){return a.time.h===slot.h&&a.time.m===slot.m});return React.createElement('td',{key:di,style:{padding:2,verticalAlign:'top',borderLeft:'1px solid var(--border)'}},
-            da.map(function(a,ai){return React.createElement('div',{key:ai,onClick:function(){setSelectedPatient(a.patient);if(setNavigationSource)setNavigationSource('schedule');setCurrentPage('chart');},style:{padding:'2px 4px',marginBottom:1,borderRadius:3,background:colorMap[a.type]||'#f3f4f6',cursor:'pointer',fontSize:11,border:a.isCustom?'2px solid #6366f1':'none'},title:a.patient.firstName+' '+a.patient.lastName},a.patient.lastName+', '+a.patient.firstName.charAt(0)+' ('+a.therapist+')')}))
-          ;}))}))))
+  var monday = getMonday(selectedDate || new Date(), weekOffset);
+  var weekDays = [];
+  for (var i = 0; i < 5; i++) { var d = new Date(monday); d.setDate(d.getDate() + i); weekDays.push(d); }
+  
+  var timeSlots = [];
+  for (var h = 7; h < 17; h++) {
+    for (var m = 0; m < 60; m += 30) {
+      var label = (h > 12 ? h-12 : h) + ':' + (m === 0 ? '00' : '30') + ' ' + (h >= 12 ? 'PM' : 'AM');
+      timeSlots.push({hour: h, min: m, label: label});
+    }
+  }
+  
+  var prevWeek = function() { setWeekOffset(weekOffset - 1); };
+  var nextWeek = function() { setWeekOffset(weekOffset + 1); };
+  
+  var getApptsForDay = function(dayDate) {
+    var dateStr = dayDate.toISOString().split('T')[0];
+    var isToday = dayDate.toDateString() === new Date().toDateString();
+    var dayOfWeek = dayDate.getDay();
+    if (dayOfWeek === 0 || dayOfWeek === 6) return [];
+    
+    var generated = [];
+    var activePatients = patients.filter(function(p) { return p.status !== 'Discharged'; });
+    if (isToday && typeof SCHEDULE_DATA !== 'undefined') {
+      SCHEDULE_DATA.forEach(function(a) { generated.push(a); });
+    } else {
+      var dayOffset = Math.floor((dayDate - new Date()) / 86400000);
+      timeSlots.forEach(function(slot, idx) {
+        var seed1 = ((idx + 1) * 7 + dayOffset * 13 + 1) % 0x7FFFFFFF;
+        var seed2 = ((idx + 1) * 11 + dayOffset * 17 + 2) % 0x7FFFFFFF;
+        if (seed1 % 100 < 65 && activePatients.length > 0) {
+          var pIdx = seed1 % activePatients.length;
+          var p = activePatients[pIdx];
+          var type = p.careStage === 'Admission (Day 1)' ? 'Initial Eval' : 'Treatment';
+          generated.push({time: slot.label, therapist: 'PT', patientId: p.id, patient: p, type: type, status: 'Scheduled'});
+        }
+        if (seed2 % 100 < 45 && activePatients.length > 0) {
+          var pIdx2 = seed2 % activePatients.length;
+          generated.push({time: slot.label, therapist: 'PTA', patientId: activePatients[pIdx2].id, patient: activePatients[pIdx2], type: 'Treatment', status: 'Scheduled'});
+        }
+      });
+    }
+    if (customAppointments) {
+      customAppointments.forEach(function(ca) {
+        if (ca.date === dateStr) {
+          var pt = patients.find(function(p) { return p.id === ca.patientId; });
+          if (pt) generated.push({time: ca.time, therapist: ca.therapist, patientId: ca.patientId, patient: pt, type: ca.type, status: 'Scheduled'});
+        }
+      });
+    }
+    return generated;
+  };
+
+  var typeColors = {'Follow-up':'#dbeafe','Re-eval':'#fef3c7','Treatment':'#dcfce7','Discharge':'#fee2e2','Initial Eval':'#f3e8ff'};
+  var typeBorders = {'Follow-up':'#3b82f6','Re-eval':'#f59e0b','Treatment':'#22c55e','Discharge':'#ef4444','Initial Eval':'#a855f7'};
+  
+  var handlePatientClick = function(appt) {
+    if (appt.patient && setSelectedPatient) {
+      setSelectedPatient(appt.patient);
+      if (setNavigationSource) setNavigationSource('schedule');
+      setCurrentPage('chart');
+    }
+  };
+
+  return (
+    <div className="card" style={{padding:0,overflow:'hidden'}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'12px 16px',background:'var(--bg-secondary)',borderBottom:'2px solid var(--border)'}}>
+        <button className="btn btn-outline btn-sm" onClick={prevWeek}>◄ Prev Week</button>
+        <h4 style={{margin:0,fontSize:16}}>Week of {monday.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</h4>
+        <button className="btn btn-outline btn-sm" onClick={nextWeek}>Next Week ►</button>
+      </div>
+      <div style={{overflowX:'auto'}}>
+        <table style={{width:'100%',borderCollapse:'collapse',fontSize:13,tableLayout:'fixed'}}>
+          <colgroup>
+            <col style={{width:'80px'}} />
+            {weekDays.map((_,i) => <col key={i} style={{width:'calc((100% - 80px)/5)'}} />)}
+          </colgroup>
+          <thead>
+            <tr>
+              <th style={{padding:'10px 8px',background:'#1e293b',color:'white',fontWeight:700,fontSize:12,textAlign:'center',position:'sticky',top:0,zIndex:2}}>Time</th>
+              {weekDays.map((d,i) => {
+                var isToday = d.toDateString() === new Date().toDateString();
+                return <th key={i} style={{padding:'10px 8px',background:isToday?'#2563eb':'#1e293b',color:'white',fontWeight:700,fontSize:12,textAlign:'center',position:'sticky',top:0,zIndex:2}}>
+                  <div>{['Mon','Tue','Wed','Thu','Fri'][i]}</div>
+                  <div style={{fontSize:14,fontWeight:800}}>{(d.getMonth()+1) + '/' + d.getDate()}</div>
+                </th>;
+              })}
+            </tr>
+          </thead>
+          <tbody>
+            {timeSlots.map((slot, si) => {
+              var isHourStart = slot.min === 0;
+              return (
+                <tr key={si} style={{background: isHourStart ? '#f8fafc' : 'white'}}>
+                  <td style={{padding:'6px 8px',fontWeight:isHourStart?700:400,fontSize:isHourStart?13:11,color:isHourStart?'#1e293b':'#94a3b8',borderBottom:'1px solid '+(isHourStart?'#cbd5e1':'#f1f5f9'),borderRight:'2px solid #e2e8f0',textAlign:'center',whiteSpace:'nowrap'}}>{slot.label}</td>
+                  {weekDays.map((dayDate, di) => {
+                    var dayAppts = getApptsForDay(dayDate);
+                    var cellAppts = dayAppts.filter(function(a) { return a.time === slot.label; });
+                    return (
+                      <td key={di} style={{padding:'3px 4px',borderBottom:'1px solid '+(isHourStart?'#cbd5e1':'#f1f5f9'),borderRight:'1px solid #f1f5f9',verticalAlign:'top',minHeight:36}}>
+                        {cellAppts.map((appt, ai) => (
+                          <div key={ai} onClick={function(){handlePatientClick(appt);}} style={{padding:'4px 6px',marginBottom:2,borderRadius:4,fontSize:11,cursor:'pointer',background:typeColors[appt.type]||'#f1f5f9',borderLeft:'3px solid '+(typeBorders[appt.type]||'#94a3b8'),lineHeight:1.3,transition:'transform 0.1s',overflow:'hidden'}}
+                            onMouseOver={function(e){e.currentTarget.style.transform='scale(1.02)';e.currentTarget.style.boxShadow='0 1px 4px rgba(0,0,0,0.15)';}}
+                            onMouseOut={function(e){e.currentTarget.style.transform='scale(1)';e.currentTarget.style.boxShadow='none';}}>
+                            <div style={{fontWeight:700,color:'#1e293b',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{appt.patient ? appt.patient.lastName + ', ' + appt.patient.firstName.charAt(0) + '.' : '—'}</div>
+                            <div style={{color:'#64748b',fontSize:10}}>{appt.therapist} • {appt.type}</div>
+                          </div>
+                        ))}
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <div style={{padding:'8px 16px',background:'var(--bg-secondary)',borderTop:'1px solid var(--border)',display:'flex',gap:12,flexWrap:'wrap',fontSize:11}}>
+        {Object.keys(typeColors).map(function(type) {
+          return <span key={type} style={{display:'flex',alignItems:'center',gap:4}}><span style={{width:12,height:12,borderRadius:2,background:typeColors[type],border:'1px solid '+typeBorders[type],display:'inline-block'}}></span>{type}</span>;
+        })}
+      </div>
+    </div>
   );
 }
 
