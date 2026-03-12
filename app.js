@@ -362,6 +362,8 @@ function Schedule({ patients, setSelectedPatient, setCurrentPage, setNavigationS
     setSelectedDate(d);
   };
 
+  const to12h = function(t) { var p = t.split(':'); var h = parseInt(p[0]); var ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12; return h + ':' + p[1] + ' ' + ap; };
+
   const scheduleForDate = useMemo(() => {
     if (isToday) {
       var todayAppts = [...SCHEDULE_DATA];
@@ -371,8 +373,8 @@ function Schedule({ patients, setSelectedPatient, setCurrentPage, setNavigationS
           if (ca.date === dateKey) {
             const pt = patients.find(p => p.id == ca.patientId);
             if (pt) {
-              for (var oi = todayAppts.length - 1; oi >= 0; oi--) { if (todayAppts[oi].time === ca.time && todayAppts[oi].therapist === ca.therapist && !todayAppts[oi].patientId) todayAppts.splice(oi, 1); }
-              todayAppts.push({time: ca.time, therapist: ca.therapist, patientId: ca.patientId, patient: pt.lastName + ', ' + pt.firstName, type: ca.type, status: 'Scheduled'});
+              for (var oi = todayAppts.length - 1; oi >= 0; oi--) { if (todayAppts[oi].time === to12h(ca.time) && todayAppts[oi].therapist === ca.therapist && !todayAppts[oi].patientId) todayAppts.splice(oi, 1); }
+              todayAppts.push({time: to12h(ca.time), therapist: ca.therapist, patientId: ca.patientId, patient: pt.lastName + ', ' + pt.firstName, type: ca.type, status: 'Scheduled'});
             }
           }
         });
@@ -421,8 +423,8 @@ function Schedule({ patients, setSelectedPatient, setCurrentPage, setNavigationS
         if (ca.date === dateKey) {
           const pt = patients.find(p => p.id == ca.patientId);
           if (pt) {
-              for (var oi = generated.length - 1; oi >= 0; oi--) { if (generated[oi].time === ca.time && generated[oi].therapist === ca.therapist && !generated[oi].patientId) generated.splice(oi, 1); }
-              generated.push({time: ca.time, therapist: ca.therapist, patientId: ca.patientId, patient: pt.lastName + ', ' + pt.firstName, type: ca.type, status: 'Scheduled'});
+              for (var oi = generated.length - 1; oi >= 0; oi--) { if (generated[oi].time === to12h(ca.time) && generated[oi].therapist === ca.therapist && !generated[oi].patientId) generated.splice(oi, 1); }
+              generated.push({time: to12h(ca.time), therapist: ca.therapist, patientId: ca.patientId, patient: pt.lastName + ', ' + pt.firstName, type: ca.type, status: 'Scheduled'});
             }
         }
       });
@@ -2153,8 +2155,8 @@ function WeeklyScheduleView({ patients, selectedDate, setSelectedPatient, setCur
         if (ca.date === dateStr) {
           var pt = patients.find(function(p) { return p.id == ca.patientId; });
           if (pt) {
-              for (var oi = generated.length - 1; oi >= 0; oi--) { if (generated[oi].time === ca.time && generated[oi].therapist === ca.therapist && !generated[oi].patientId) generated.splice(oi, 1); }
-              generated.push({time: ca.time, therapist: ca.therapist, patientId: ca.patientId, patient: pt.lastName + ', ' + pt.firstName, type: ca.type, status: 'Scheduled'});
+              for (var oi = generated.length - 1; oi >= 0; oi--) { if (generated[oi].time === to12h(ca.time) && generated[oi].therapist === ca.therapist && !generated[oi].patientId) generated.splice(oi, 1); }
+              generated.push({time: to12h(ca.time), therapist: ca.therapist, patientId: ca.patientId, patient: pt.lastName + ', ' + pt.firstName, type: ca.type, status: 'Scheduled'});
             }
         }
       });
