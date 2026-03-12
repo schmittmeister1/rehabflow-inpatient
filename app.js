@@ -370,7 +370,10 @@ function Schedule({ patients, setSelectedPatient, setCurrentPage, setNavigationS
         customAppointments.forEach(ca => {
           if (ca.date === dateKey) {
             const pt = patients.find(p => p.id == ca.patientId);
-            if (pt) todayAppts.push({time: ca.time, therapist: ca.therapist, patientId: ca.patientId, patient: pt, type: ca.type, status: 'Scheduled'});
+            if (pt) {
+              for (var oi = todayAppts.length - 1; oi >= 0; oi--) { if (todayAppts[oi].time === ca.time && todayAppts[oi].therapist === ca.therapist && !todayAppts[oi].patientId) todayAppts.splice(oi, 1); }
+              todayAppts.push({time: ca.time, therapist: ca.therapist, patientId: ca.patientId, patient: pt, type: ca.type, status: 'Scheduled'});
+            }
           }
         });
       }
@@ -406,7 +409,7 @@ function Schedule({ patients, setSelectedPatient, setCurrentPage, setNavigationS
         var p = patients.find(function(pt){return pt.id==a.patientId});
         if(p){
           var tm={'07:00':'7:00 AM','07:30':'7:30 AM','08:00':'8:00 AM','08:30':'8:30 AM','09:00':'9:00 AM','09:30':'9:30 AM','10:00':'10:00 AM','10:30':'10:30 AM','11:00':'11:00 AM','11:30':'11:30 AM','12:00':'12:00 PM','12:30':'12:30 PM','13:00':'1:00 PM','13:30':'1:30 PM','14:00':'2:00 PM','14:30':'2:30 PM','15:00':'3:00 PM','15:30':'3:30 PM','16:00':'4:00 PM'};
-          generated.push({time:tm[a.time]||a.time,patientId:p.id,patientName:p.firstName+' '+p.lastName,therapist:a.therapist,type:a.type,isCustom:true});
+          var mappedTime=tm[a.time]||a.time; for(var oi=generated.length-1;oi>=0;oi--){if(generated[oi].time===mappedTime&&generated[oi].therapist===a.therapist&&!generated[oi].patientId)generated.splice(oi,1);} generated.push({time:mappedTime,patientId:p.id,patientName:p.firstName+' '+p.lastName,therapist:a.therapist,type:a.type,isCustom:true});
         }
       });
     }
@@ -418,8 +421,9 @@ function Schedule({ patients, setSelectedPatient, setCurrentPage, setNavigationS
         if (ca.date === dateKey) {
           const pt = patients.find(p => p.id == ca.patientId);
           if (pt) {
-            generated.push({time: ca.time, therapist: ca.therapist, patientId: ca.patientId, patient: pt, type: ca.type, status: 'Scheduled'});
-          }
+              for (var oi = generated.length - 1; oi >= 0; oi--) { if (generated[oi].time === ca.time && generated[oi].therapist === ca.therapist && !generated[oi].patientId) generated.splice(oi, 1); }
+              generated.push({time: ca.time, therapist: ca.therapist, patientId: ca.patientId, patient: pt, type: ca.type, status: 'Scheduled'});
+            }
         }
       });
     }
@@ -2148,7 +2152,10 @@ function WeeklyScheduleView({ patients, selectedDate, setSelectedPatient, setCur
       customAppointments.forEach(function(ca) {
         if (ca.date === dateStr) {
           var pt = patients.find(function(p) { return p.id == ca.patientId; });
-          if (pt) generated.push({time: ca.time, therapist: ca.therapist, patientId: ca.patientId, patient: pt, type: ca.type, status: 'Scheduled'});
+          if (pt) {
+              for (var oi = generated.length - 1; oi >= 0; oi--) { if (generated[oi].time === ca.time && generated[oi].therapist === ca.therapist && !generated[oi].patientId) generated.splice(oi, 1); }
+              generated.push({time: ca.time, therapist: ca.therapist, patientId: ca.patientId, patient: pt, type: ca.type, status: 'Scheduled'});
+            }
         }
       });
     }
