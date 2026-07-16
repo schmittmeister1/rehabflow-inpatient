@@ -53,25 +53,57 @@ function generateClinicalData(patient) {
 
 // ==================== LOGIN ====================
 function LoginPage({ onLogin }) {
-  const [username, setUsername] = useState('smitchell');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('PT');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async (e) => {
+    if (e) e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      const result = await window.RehabFlowDB.signIn(email, password);
+      if (result.error) {
+        setError(result.error.message || 'Login failed');
+        setLoading(false);
+        return;
+      }
+      const profile = await window.RehabFlowDB.getProfile();
+      if (profile.error || !profile.data) {
+        setError('Could not load profile');
+        setLoading(false);
+        return;
+      }
+      const p = profile.data;
+      const displayName = p.full_name ? (p.full_name + (p.credentials ? ', ' + p.credentials : '')) : email;
+      onLogin({
+        id: p.id,
+        email: email,
+        role: p.role,
+        displayName: displayName,
+        supabaseRole: p.role,
+        credentials: p.credentials,
+        fullName: p.full_name || email,
+        must_change_password: p.must_change_password
+      });
+    } catch (err) { setError(err.message || 'Login failed'); setLoading(false); }
+  };
+
   return (
     <div className="login-page">
       <div className="login-box">
         <h1>RehabFlow <span style={{color:'var(--accent)'}}>Inpatient</span></h1>
         <p className="subtitle">Hospital Inpatient PT/PTA EMR Training System</p>
-        <div className="login-role">
-          {['PT','PTA','Student PT','Student PTA'].map(r => (
-            <button key={r} className={role===r?'active':''} onClick={()=>setRole(r)}>{r}</button>
-          ))}
-        </div>
-        <label>Username</label>
-        <input value={username} onChange={e=>setUsername(e.target.value)} placeholder="Enter username"/>
-        <label>Password</label>
-        <input type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="Enter password" onKeyDown={e=>e.key==='Enter'&&onLogin({username,role,displayName:role==='PTA'?'Alex Rivera, PTA':role==='Student PT'?`${username} (Student PT)`:role==='Student PTA'?`${username} (Student PTA)`:'Dr. Sarah Mitchell, PT, DPT'})}/>
-        <button onClick={()=>onLogin({username,role,displayName:role==='PTA'?'Alex Rivera, PTA':role==='Student PT'?`${username} (Student PT)`:role==='Student PTA'?`${username} (Student PTA)`:'Dr. Sarah Mitchell, PT, DPT'})}>Sign In</button>
-        <p style={{marginTop:12,fontSize:11,color:'var(--text-muted)',textAlign:'center'}}>Training environment  --  No real patient data</p>
+        {error && <div style={{background:'#fee2e2',color:'#dc2626',padding:'8px 12px',borderRadius:6,marginBottom:12,fontSize:13}}>{error}</div>}
+        <form onSubmit={handleLogin}>
+          <label>Email</label>
+          <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="Enter your email"/>
+          <label>Password</label>
+          <input type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="Enter password" onKeyDown={e=>e.key==='Enter'&&handleLogin(e)}/>
+          <button type="submit" disabled={loading}>{loading ? 'Signing in...' : 'Sign In'}</button>
+        </form>
+        <p style={{marginTop:12,fontSize:11,color:'var(--text-muted)',textAlign:'center'}}>Training environment - No real patient data</p>
       </div>
     </div>
   );
@@ -153,6 +185,41 @@ function NewAdmissionModal({ onClose, onSave }) {
   );
 }
 
+// ==================== PASSWORD CHANGE MODAL ====================
+function PasswordChangeModal({ user, onPasswordChanged }) {
+  const [newPw, setNewPw] = useState('');
+  const [confirmPw, setConfirmPw] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    if (newPw.length < 8) { setError('Password must be at least 8 characters'); return; }
+    if (newPw !== confirmPw) { setError('Passwords do not match'); return; }
+    setLoading(true);
+    try {
+      const result = await window.RehabFlowDB.changePassword(newPw);
+      if (result.error) { setError(result.error.message || 'Failed to change password'); setLoading(false); return; }
+      onPasswordChanged();
+    } catch (err) { setError(err.message); setLoading(false); }
+  };
+  return (
+    <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'linear-gradient(135deg,#1e3a5f,#2d5f8a)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:9999}}>
+      <div style={{background:'white',borderRadius:12,padding:40,maxWidth:420,width:'90%',boxShadow:'0 20px 60px rgba(0,0,0,0.3)'}}>
+        <h2 style={{margin:'0 0 8px',color:'#1e3a5f',fontSize:22}}>Change Your Password</h2>
+        <p style={{color:'#666',fontSize:14,marginBottom:24}}>You must set a new password before continuing.</p>
+        {error && <div style={{background:'#fee',color:'#c00',padding:'8px 12px',borderRadius:6,marginBottom:12,fontSize:13}}>{error}</div>}
+        <form onSubmit={handleSubmit}>
+          <label style={{display:'block',fontSize:13,fontWeight:600,marginBottom:4}}>New Password</label>
+          <input type="password" value={newPw} onChange={e=>setNewPw(e.target.value)} style={{width:'100%',padding:'10px',border:'1px solid #ddd',borderRadius:6,marginBottom:12,fontSize:14,boxSizing:'border-box'}} placeholder="At least 8 characters"/>
+          <label style={{display:'block',fontSize:13,fontWeight:600,marginBottom:4}}>Confirm Password</label>
+          <input type="password" value={confirmPw} onChange={e=>setConfirmPw(e.target.value)} style={{width:'100%',padding:'10px',border:'1px solid #ddd',borderRadius:6,marginBottom:16,fontSize:14,boxSizing:'border-box'}} placeholder="Confirm new password"/>
+          <button type="submit" disabled={loading} style={{width:'100%',padding:'12px',background:'#1e3a5f',color:'white',border:'none',borderRadius:6,fontSize:15,fontWeight:600,cursor:'pointer'}}>{loading ? 'Changing...' : 'Set New Password'}</button>
+        </form>
+      </div>
+    </div>
+  );
+}
 // ==================== MAIN APP ====================
 function App() {
   const [user, setUser] = useState(null);
@@ -166,6 +233,8 @@ function App() {
 
   if (!user) return <LoginPage onLogin={setUser}/>;
 
+  if (user && user.must_change_password) return <PasswordChangeModal user={user} onPasswordChanged={()=>setUser({...user, must_change_password: false})} />;
+
   const navItems = [
     { id:'dashboard', label:'Dashboard', icon:'\u{1F3E5}' },
     { id:'schedule', label:'Schedule', icon:'\u{1F4C5}' },
@@ -173,6 +242,7 @@ function App() {
     { id:'unitBoard', label:'Unit Board', icon:'\u{1F4CB}' },
   
     { id:'messages', label:'Messages', icon:'\u{2709}' },
+    ...(user.role==='admin' ? [{ id:'admin', label:'Admin Panel', icon:'\u2699\uFE0F' }] : []),
   ];
 
   return (
@@ -195,7 +265,7 @@ function App() {
         <div className="sidebar-user">
           <div className="name">{user.displayName}</div>
           <div className="role">{user.role} | Inpatient Rehab</div>
-          <div style={{marginTop:8}}><button onClick={()=>setUser(null)} style={{background:'none',border:'1px solid rgba(255,255,255,0.2)',color:'var(--sidebar-text)',padding:'4px 12px',borderRadius:4,cursor:'pointer',fontSize:11}}>Sign Out</button></div>
+          <div style={{marginTop:8}}><button onClick={()=>{if(window.RehabFlowDB)window.RehabFlowDB.signOut();setUser(null);}} style={{background:'none',border:'1px solid rgba(255,255,255,0.2)',color:'var(--sidebar-text)',padding:'4px 12px',borderRadius:4,cursor:'pointer',fontSize:11}}>Sign Out</button></div>
         </div>
       </div>
       <div className="main-content">
@@ -216,6 +286,7 @@ function App() {
       </div>
       {showNewAdmission && <NewAdmissionModal onClose={()=>setShowNewAdmission(false)} onSave={(form)=>{
         var newId = Math.max(...patients.map(function(p){return p.id}),0)+1;
+          {currentPage==='admin' && user.role==='admin' && <div id="admin-panel-root" ref={el => { if(el && !el.dataset.rendered) { el.dataset.rendered='true'; if(window.AdminPanel) window.AdminPanel.render(el); }}}></div>}
         var dobDate = new Date(form.dob);
         var today = new Date();
         var age = Math.floor((today - dobDate)/(365.25*24*60*60*1000));
