@@ -834,7 +834,7 @@ function PatientChart({ patient, user, setCurrentPage, patients, setPatients, se
           {chartTab==='evalNote' && <InitialEvalNote patient={patient} user={user} onSignNote={handleSignNote}/>}
           {chartTab==='dailyNote' && <DailyTreatmentNote patient={patient} user={user} onSignNote={handleSignNote} onSaveDraft={handleSaveDraft}/>}
           {chartTab==='progressNote' && <ProgressNote patient={patient} user={user} onSignNote={handleSignNote} onSaveDraft={handleSaveDraft}/>}
-          {chartTab==='documents' && <DocumentsTab patient={patient}/>}
+          {chartTab==='documents' && <DocumentsTab patient={patient} sentMessages={sentMessages}/>}
           {chartTab==='sendMessage' && <SendMessageFromChart patient={patient} patients={patients} sentMessages={sentMessages} setSentMessages={setSentMessages} setPatients={setPatients} setSelectedPatient={setSelectedPatient}/>}
         </div>
       </div>
@@ -2096,6 +2096,29 @@ function generateNoteContent(note, patient) {
     ].join('\n');
   }
 
+
+  if (noteType === 'message') {
+    return [header, '',
+      String.fromCodePoint(0x2550).repeat(55),
+      '                    PROVIDER MESSAGE',
+      String.fromCodePoint(0x2550).repeat(55),
+      '',
+      'To:      ' + (note.recipient || 'N/A'),
+      'From:    ' + (note.author || 'N/A'),
+      'Date:    ' + (note.date || 'N/A'),
+      'Subject: ' + (note.subject || 'General Communication'),
+      '',
+      String.fromCodePoint(0x2500).repeat(55),
+      '',
+      (note.body || note.content || 'No message content'),
+      '',
+      String.fromCodePoint(0x2500).repeat(55),
+      'Message sent via RehabFlow Inpatient EMR',
+      String.fromCodePoint(0x2550).repeat(55),
+    ].join('\n');
+  }
+
+
   // FALLBACK
   return header + '\n\n' + [
     'CLINICAL NOTE - ' + (note.type || 'General').toUpperCase(),
@@ -2129,14 +2152,36 @@ function generateNoteContent(note, patient) {
   ].join('\n');
 }
 
-function DocumentsTab({ patient }) {
+function DocumentsTab({ patient, sentMessages }) {
   const [viewingNote, setViewingNote] = React.useState(null);
+  
+  var allDocs = (patient.noteHistory || []).slice();
+  if (sentMessages && sentMessages.length > 0) {
+    var pName = (patient.firstName + ' ' + patient.lastName).toLowerCase();
+    sentMessages.forEach(function(msg) {
+      var ref = (msg.patientRef || '').toLowerCase();
+      if (ref === pName || msg.patientId === patient.id) {
+        allDocs.push({
+          type: 'Message',
+          date: msg.date || msg.timestamp,
+          author: msg.from || msg.author || 'Unknown',
+          status: 'Sent',
+          subject: msg.subject || 'General Communication',
+          recipient: msg.to || msg.recipient || 'Unknown',
+          body: msg.body || msg.content || ''
+        });
+      }
+    });
+  }
+  allDocs.sort(function(a, b) { return new Date(b.date || 0) - new Date(a.date || 0); });
+  
   return React.createElement('div', {style:{padding:'20px'}},
     React.createElement('h2', {style:{fontSize:'20px',fontWeight:'600',marginBottom:'16px',color:'#1e293b'}}, 'Documents & Notes'),
-    (!patient.noteHistory||patient.noteHistory.length===0)
+    !(allDocs.length > 0)
       ? React.createElement('div', {style:{padding:'40px',textAlign:'center',color:'#94a3b8',background:'#f8fafc',borderRadius:'8px'}},
           React.createElement('div', {style:{fontSize:'32px',marginBottom:'8px'}}, String.fromCodePoint(0x1F4C4)),
-          React.createElement('p', null, 'No notes documented yet.'))
+          React.createElement('p', null, 'No notes documented yet')
+        )
       : React.createElement('table', {style:{width:'100%',borderCollapse:'collapse',background:'#fff',borderRadius:'8px',overflow:'hidden',boxShadow:'0 1px 3px rgba(0,0,0,0.1)'}},
           React.createElement('thead', null,
             React.createElement('tr', {style:{background:'#f1f5f9'}},
@@ -2144,30 +2189,51 @@ function DocumentsTab({ patient }) {
               React.createElement('th', {style:{padding:'10px 12px',textAlign:'left',fontWeight:'600',color:'#475569'}}, 'Date'),
               React.createElement('th', {style:{padding:'10px 12px',textAlign:'left',fontWeight:'600',color:'#475569'}}, 'Author'),
               React.createElement('th', {style:{padding:'10px 12px',textAlign:'left',fontWeight:'600',color:'#475569'}}, 'Status'),
-              React.createElement('th', {style:{padding:'10px 12px',textAlign:'left',fontWeight:'600',color:'#475569'}}, 'Action'))),
+              React.createElement('th', {style:{padding:'10px 12px',textAlign:'left',fontWeight:'600',color:'#475569'}}, 'Details'),
+              React.createElement('th', {style:{padding:'10px 12px',textAlign:'left',fontWeight:'600',color:'#475569'}}, 'Action')
+            )
+          ),
           React.createElement('tbody', null,
-            patient.noteHistory.map((n,i) =>
-              React.createElement('tr', {key:i, style:{borderBottom:'1px solid #e2e8f0'}},
+            allDocs.map(function(n, i) {
+              return React.createElement('tr', {key:i, style:{borderBottom:'1px solid #e2e8f0'}},
                 React.createElement('td', {style:{padding:'10px 12px',fontWeight:'500'}}, n.type),
                 React.createElement('td', {style:{padding:'10px 12px',color:'#64748b'}}, n.date),
                 React.createElement('td', {style:{padding:'10px 12px',color:'#64748b'}}, n.author),
                 React.createElement('td', {style:{padding:'10px 12px'}},
                   React.createElement('span', {style:{padding:'2px 8px',borderRadius:'12px',fontSize:'11px',fontWeight:'500',
                     background: n.status==='Signed'||n.status==='Signed & Locked'?'#dcfce7':n.status==='Co-Signed'?'#dbeafe':n.status==='Draft'?'#fef9c3':n.status==='Sent'?'#e0e7ff':'#fef9c3',
-                    color: n.status==='Signed'||n.status==='Signed & Locked'?'#166534':n.status==='Co-Signed'?'#1e40af':n.status==='Draft'?'#854d0e':n.status==='Sent'?'#3730a3':'#854d0e'}}, n.status)),
+                    color: n.status==='Signed'||n.status==='Signed & Locked'?'#166534':n.status==='Co-Signed'?'#1e40af':n.status==='Draft'?'#854d0e':n.status==='Sent'?'#3730a3':'#854d0e'
+                  }}, n.status)
+                ),
+                React.createElement('td', {style:{padding:'10px 12px',color:'#64748b',fontSize:'12px'}},
+                  n.type === 'Message' ? ('To: ' + (n.recipient || '') + ' | ' + (n.subject || '')) : ''
+                ),
                 React.createElement('td', {style:{padding:'10px 12px'}},
-                  React.createElement('button', {onClick:()=>setViewingNote(n), style:{padding:'4px 12px',fontSize:'12px',border:'1px solid #3b82f6',borderRadius:'6px',background:'#fff',color:'#3b82f6',cursor:'pointer',fontWeight:'500'}}, 'View')))))),
-    viewingNote && React.createElement('div', {style:{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:10000,display:'flex',alignItems:'center',justifyContent:'center',padding:'20px'}, onClick:()=>setViewingNote(null)},
-      React.createElement('div', {style:{background:'#fff',borderRadius:'12px',width:'100%',maxWidth:'800px',maxHeight:'90vh',display:'flex',flexDirection:'column',boxShadow:'0 25px 50px rgba(0,0,0,0.25)'}, onClick:e=>e.stopPropagation()},
+                  React.createElement('button', {onClick:function(){setViewingNote(n)}, style:{padding:'4px 12px',fontSize:'12px',border:'1px solid #3b82f6',borderRadius:'6px',background:'#fff',color:'#3b82f6',cursor:'pointer',fontWeight:'500'}}, 'View')
+                )
+              );
+            })
+          )
+        ),
+    viewingNote && React.createElement('div', {style:{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',zIndex:10000,display:'flex',alignItems:'center',justifyContent:'center',padding:'20px'}, onClick:function(){setViewingNote(null)}},
+      React.createElement('div', {style:{background:'#fff',borderRadius:'12px',width:'100%',maxWidth:'800px',maxHeight:'90vh',display:'flex',flexDirection:'column',boxShadow:'0 25px 50px rgba(0,0,0,0.25)'}, onClick:function(e){e.stopPropagation()}},
         React.createElement('div', {style:{padding:'20px 24px',borderBottom:'1px solid #e2e8f0',display:'flex',justifyContent:'space-between',alignItems:'center',background:'#f8fafc',borderRadius:'12px 12px 0 0'}},
           React.createElement('h3', {style:{margin:0,fontSize:'18px',fontWeight:'700',color:'#1e293b'}}, viewingNote.type),
           React.createElement('div', {style:{display:'flex',gap:'8px'}},
-            React.createElement('button', {onClick:()=>{var nc=generateNoteContent(viewingNote,patient);var w=window.open('','_blank');w.document.write('<!DOCTYPE html><html><head><title>'+viewingNote.type+'</title><style>body{font-family:Consolas,monospace;padding:40px;max-width:800px;margin:auto;line-height:1.8;white-space:pre-wrap;word-wrap:break-word;font-size:13px;}@media print{body{padding:20px;font-size:12px;}}</style></head><body>'+nc+'</body></html>');w.document.close();}, style:{padding:'6px 14px',fontSize:'12px',border:'none',borderRadius:'6px',background:'#3b82f6',color:'#fff',cursor:'pointer',fontWeight:'500'}}, 'Print'),
-            React.createElement('button', {onClick:()=>setViewingNote(null), style:{padding:'6px 14px',fontSize:'12px',border:'none',borderRadius:'6px',background:'#ef4444',color:'#fff',cursor:'pointer',fontWeight:'500'}}, 'Close'))),
+            React.createElement('button', {onClick:function(){var nc=generateNoteContent(viewingNote,patient);var w=window.open('','_blank');w.document.write('<!DOCTYPE html><html><head><title>'+viewingNote.type+'</title><style>body{font-family:Consolas,monospace;padding:40px;max-width:800px;margin:auto;line-height:1.8;white-space:pre-wrap;word-wrap:break-word;font-size:13px}@media print{body{padding:20px;font-size:12px}}</style></head><body>'+nc+'</body></html>');w.document.close()}, style:{padding:'6px 14px',fontSize:'12px',border:'none',borderRadius:'6px',background:'#3b82f6',color:'#fff',cursor:'pointer',fontWeight:'500'}}, 'Print'),
+            React.createElement('button', {onClick:function(){setViewingNote(null)}, style:{padding:'6px 14px',fontSize:'12px',border:'none',borderRadius:'6px',background:'#ef4444',color:'#fff',cursor:'pointer',fontWeight:'500'}}, 'Close')
+          )
+        ),
         React.createElement('div', {style:{padding:'20px 24px',borderBottom:'1px solid #e2e8f0'}},
-          React.createElement('p', {style:{margin:'4px 0',fontSize:'13px',color:'#64748b'}}, viewingNote.date+' | '+viewingNote.author+' | '+viewingNote.status)),
+          React.createElement('p', {style:{margin:'4px 0',fontSize:'13px',color:'#64748b'}}, viewingNote.date + ' | ' + viewingNote.author + ' | ' + viewingNote.status)
+        ),
         React.createElement('div', {style:{padding:'24px',overflowY:'auto',flex:1}},
-          React.createElement('pre', {style:{fontFamily:'Consolas,Monaco,monospace',fontSize:'13px',lineHeight:'1.7',whiteSpace:'pre-wrap',wordWrap:'break-word',color:'#1e293b',margin:0,background:'#fafafa',padding:'20px',borderRadius:'8px',border:'1px solid #e2e8f0'}}, generateNoteContent(viewingNote,patient))))));}
+          React.createElement('pre', {style:{fontFamily:'Consolas, Monaco, monospace',fontSize:'13px',lineHeight:'1.7',whiteSpace:'pre-wrap',wordWrap:'break-word',color:'#1e293b',margin:0,background:'#fafafa',padding:'20px',borderRadius:'8px',border:'1px solid #e2e8f0'}}, generateNoteContent(viewingNote, patient))
+        )
+      )
+    )
+  );
+}
 
 // ==================== RENDER ====================
 
