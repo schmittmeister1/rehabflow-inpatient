@@ -279,7 +279,7 @@ function App() {
           {currentPage==='dashboard' && <Dashboard patients={patients} setSelectedPatient={setSelectedPatient} setCurrentPage={setCurrentPage}/>}
           {currentPage==='schedule' && <Schedule patients={patients} setSelectedPatient={setSelectedPatient} setCurrentPage={setCurrentPage} setNavigationSource={setNavigationSource} customAppointments={customAppointments} setCustomAppointments={setCustomAppointments}/>}
           {currentPage==='patients' && <PatientCensus patients={patients} setPatients={setPatients} setSelectedPatient={setSelectedPatient} setCurrentPage={setCurrentPage} onNewAdmission={()=>setShowNewAdmission(true)} setNavigationSource={setNavigationSource}/>}
-          {currentPage==='unitBoard' && <UnitBoard patients={patients} setSelectedPatient={setSelectedPatient} setCurrentPage={setCurrentPage}/>}
+          {currentPage==='unitBoard' && <UnitBoard patients={patients} setSelectedPatient={setSelectedPatient} setCurrentPage={setCurrentPage} setNavigationSource={setNavigationSource}/>}
           {currentPage==='messages' && <MessagesPage patients={patients} sentMessages={sentMessages} setSentMessages={setSentMessages}/>}
           {currentPage==='chart' && selectedPatient && <PatientChart patient={selectedPatient} user={user} setCurrentPage={setCurrentPage} patients={patients} setPatients={setPatients} setSelectedPatient={setSelectedPatient} navigationSource={navigationSource} sentMessages={sentMessages} setSentMessages={setSentMessages}/>}
         </div>
@@ -686,7 +686,7 @@ function PatientCensus({ patients, setPatients, setSelectedPatient, setCurrentPa
 }
 
 // ==================== UNIT BOARD ====================
-function UnitBoard({ patients, setSelectedPatient, setCurrentPage }) {
+function UnitBoard({ patients, setSelectedPatient, setCurrentPage, setNavigationSource }) {
   const [selectedUnit, setSelectedUnit] = useState('All');
   const units = [...new Set(patients.filter(p=>p.status!=='Discharged').map(p=>p.unit))].sort();
   const active = patients.filter(p => p.status !== 'Discharged' && (selectedUnit === 'All' || p.unit === selectedUnit));
