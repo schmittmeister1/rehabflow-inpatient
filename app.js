@@ -286,7 +286,7 @@ function App() {
       </div>
       {showNewAdmission && <NewAdmissionModal onClose={()=>setShowNewAdmission(false)} onSave={(form)=>{
         var newId = Math.max(...patients.map(function(p){return p.id}),0)+1;
-          {currentPage==='admin' && user.role==='admin' && <div id="admin-panel-root" ref={el => { if(el && !el.dataset.rendered) { el.dataset.rendered='true'; if(window.AdminPanel) window.AdminPanel.render(el); }}}></div>}
+          {currentPage==='admin' && user.role==='admin' && <div id="admin-panel-root" ref={el => { if(el && !el.dataset.rendered) { el.dataset.rendered='true'; if(window.AdminPanel) ReactDOM.render(React.createElement(window.AdminPanel, {user: user}), el); }}}></div>}
         var dobDate = new Date(form.dob);
         var today = new Date();
         var age = Math.floor((today - dobDate)/(365.25*24*60*60*1000));
