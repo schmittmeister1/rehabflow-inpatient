@@ -301,9 +301,9 @@ function App() {
           wbStatus: form.wbStatus || 'WBAT', codeStatus: form.codeStatus || 'Full Code',
           insurance: form.insurance || 'Medicare A', attendingMD: form.attendingMD || '',
           admitReason: form.dx || '', pmh: form.pmh || '', meds: form.medications || '',
-          priorFunction: form.priorFunction || '',
-          socialHistory: { livingSituation: form.livingSituation || '', priorMobility: form.priorMobility || '', homeStairs: form.homeStairs || '', occupation: form.occupation || '' },
-          cognition: { orientation: form.orientation || 'Alert and oriented x4', commandFollowing: form.commandFollowing || 'Follows 2-step commands', safetyAwareness: form.safetyAwareness || 'Good' },
+          priorFunction: { selfCare: 3, indoorMobility: 3, stairs: 3, cognition: 3 }, priorFunctionNotes: form.priorFunction || '',
+          socialHistory: { living: form.livingSituation || '', priorMobility: form.priorMobility || '', stairs: form.homeStairs || '', occupation: form.occupation || '', emergencyContact: '' },
+          cognition: { oriented: form.orientation || 'Alert and oriented x4', followsCommands: form.commandFollowing || 'Follows 2-step commands', safety: form.safetyAwareness || 'Good' },
           vitals: { hr: 78, bp_sys: 128, bp_dia: 76, rr: 16, spo2: 97, temp: '98.4', o2_device: 'Room Air', pain: 3 },
           assistLevels: { bedMobility: { supineToSit: 'Mod A', sitToSupine: 'Mod A', rolling: 'Mod A', scooting: 'Min A' }, transfers: { sitToStand: 'Mod A', standPivot: 'Mod A', slidingBoard: 'Not Tested', squatPivot: 'Mod A', bedToChair: 'Mod A', toiletTransfer: 'Mod A', tubShower: 'Not Tested', carTransfer: 'Not Tested' }, gait: { levelSurfaces: 'Mod A', unevenSurfaces: 'Not Tested', distance: '50 feet', assistDevice: 'Rolling walker', gaitBelt: 'Yes' }, stairs: { stairsUp: 'Not Tested', stairsDown: 'Not Tested', railUse: 'Bilateral rails', steps: 'Not tested' } },
           ggMobility: { A: { admission: 3, goal: 5, discharge: null }, B: { admission: 3, goal: 5, discharge: null }, C: { admission: 3, goal: 5, discharge: null }, D: { admission: 3, goal: 5, discharge: null }, E: { admission: 3, goal: 5, discharge: null }, F: { admission: 3, goal: 5, discharge: null }, G: { admission: 2, goal: 4, discharge: null }, H: { admission: 2, goal: 4, discharge: null }, I: { admission: 3, goal: 5, discharge: null }, J: { admission: 2, goal: 4, discharge: null }, K: { admission: 2, goal: 4, discharge: null }, L: { admission: 1, goal: 3, discharge: null }, M: { admission: 1, goal: 3, discharge: null }, N: { admission: 1, goal: 3, discharge: null }, O: { admission: 1, goal: 3, discharge: null }, P: { admission: 2, goal: 4, discharge: null }, R: { admission: 9, goal: 9, discharge: null }, S: { admission: 9, goal: 9, discharge: null } },
@@ -956,7 +956,7 @@ function VitalsTab({ patient }) {
           </label>
         ))}
       </div>
-      <div style={{marginTop:12}}><button className="btn btn-primary">Save Vitals</button></div>
+      <div style={{marginTop:12}}><button className="btn btn-primary" onClick={(e)=>{const b=e.target;b.textContent='Saved \u2713';setTimeout(()=>{b.textContent='Save Vitals';},1500);}}>Save Vitals</button></div>
     </div>
   );
 }
@@ -1182,7 +1182,7 @@ function SectionGGTab({ patient }) {
         </div>
       )}
 
-      <div style={{marginTop:12}}><button className="btn btn-primary">Save Section GG Scores</button></div>
+      <div style={{marginTop:12}}><button className="btn btn-primary" onClick={(e)=>{const b=e.target;b.textContent='Saved \u2713';setTimeout(()=>{b.textContent='Save Section GG Scores';},1500);}}>Save Section GG Scores</button></div>
     </div>
   );
 }
@@ -1299,7 +1299,7 @@ function AssistLevelsTab({ patient }) {
       </div>
 
       <div style={{display:'flex',gap:8}}>
-        <button className="btn btn-primary">Save Assist Levels</button>
+        <button className="btn btn-primary" onClick={(e)=>{const b=e.target;b.textContent='Saved \u2713';setTimeout(()=>{b.textContent='Save Assist Levels';},1500);}}>Save Assist Levels</button>
       </div>
     </div>
   );
